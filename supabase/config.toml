@@ -1,0 +1,6 @@
+project_id = "qsbklzaovqshsznlvurg"
+
+# Custom authentication: valid master JWT + admin_access, or a Vault cron token.
+[functions.music-news]
+verify_jwt = false
+entrypoint = "./functions/music-news/index.ts"

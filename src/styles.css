@@ -2395,3 +2395,347 @@ p {
     transform: none;
   }
 }
+.player-wrap {
+  position: sticky;
+  top: 93px;
+  z-index: 19;
+  background: #0c0e0dec;
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid #3a3520;
+  margin: 0;
+  padding: 0 24px;
+}
+.player-wrap .radio-player {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 80px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 10px 0;
+  gap: 21px;
+}
+.player-wrap .player-cover {
+  width: 50px;
+  height: 50px;
+}
+.player-wrap .player-feedback {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 0 10px;
+}
+.player-wrap .radio-player:fullscreen {
+  background: #151513;
+  max-width: none;
+  height: 100%;
+  padding: 40px;
+}
+main section[id] {
+  scroll-margin-top: 195px;
+}
+.listener-poll {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 65px;
+  border: 1px solid #4b4225;
+  border-radius: 6px;
+  padding: 40px;
+  background: linear-gradient(115deg, #1f1d10, #121715 70%);
+  margin-top: 48px;
+}
+.poll-intro .eyebrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 9px;
+}
+.poll-intro h2 {
+  font-family: var(--heading);
+  font-size: 45px;
+  line-height: 1.02;
+  letter-spacing: -1px;
+  margin: 18px 0;
+}
+.poll-intro h2 span {
+  color: var(--yellow);
+}
+.poll-intro p {
+  font-size: 12px;
+  color: #a6aca0;
+  line-height: 1.8;
+  max-width: 260px;
+}
+.poll-note {
+  display: block;
+  font-size: 9px;
+  color: #818d7d;
+  margin-top: 28px;
+}
+.poll-panel h3 {
+  font-size: 21px;
+  line-height: 1.4;
+  margin: 12px 0 22px;
+}
+.poll-panel > small {
+  display: block;
+  color: #96a38e;
+  margin: -12px 0 20px;
+  font-size: 10px;
+}
+.poll-options {
+  border: 0;
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  margin: 0 0 23px;
+}
+.poll-options label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #3e4435;
+  background: #0d120ec9;
+  border-radius: 4px;
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+.poll-options label.selected {
+  border-color: #d5b837;
+  background: #3b351633;
+}
+.poll-options input {
+  accent-color: var(--yellow);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.poll-options svg {
+  margin-left: auto;
+  color: var(--yellow);
+}
+.poll-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.poll-actions .yellow-button {
+  min-height: 40px;
+  font-size: 10px;
+}
+.text-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #d3d6c9;
+}
+.poll-message {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #e3cf80;
+  margin: 17px 0 0;
+}
+.poll-message:empty {
+  display: none;
+}
+.poll-results {
+  display: grid;
+  gap: 16px;
+}
+.poll-result > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.poll-result strong {
+  color: var(--yellow);
+  white-space: nowrap;
+  font-size: 12px;
+}
+.poll-result small {
+  font-size: 10px;
+  color: #8d9b8e;
+  font-weight: 400;
+}
+.poll-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: #343d32;
+  overflow: hidden;
+}
+.poll-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.poll-results > p {
+  font-size: 10px;
+  color: #8b998c;
+  margin: 0 0 15px;
+}
+.empty-state {
+  border: 1px solid #35382e;
+  border-radius: 4px;
+  padding: 32px;
+  font-size: 13px;
+  color: #a6af99;
+}
+.empty-state strong {
+  color: white;
+  font-size: 22px;
+}
+.empty-state p {
+  margin-top: 14px;
+  line-height: 1.6;
+}
+.source-attribution {
+  font-size: 10px;
+  color: #91a083;
+  line-height: 1.6;
+}
+.news-content > .source-attribution {
+  display: block;
+  margin-top: 12px;
+}
+.news-credit {
+  font-size: 9px;
+  line-height: 1.7;
+  color: #848d7f;
+  margin-top: 20px;
+}
+.news-credit a,
+.source-attribution a {
+  color: #d4ca9e;
+  text-decoration: underline;
+}
+.news-section {
+  margin-top: 50px;
+}
+.poll-panel > p[role="alert"] {
+  color: #f3a88f;
+  margin-bottom: 20px;
+}
+@media (max-width: 1100px) {
+  .listener-poll {
+    gap: 35px;
+    padding: 30px;
+  }
+  .poll-intro h2 {
+    font-size: 39px;
+  }
+}
+@media (max-width: 800px) {
+  .player-wrap {
+    top: 79px;
+    padding: 0 20px;
+  }
+  .player-wrap .radio-player {
+    height: 72px;
+    min-height: 72px;
+    gap: 14px;
+    padding: 10px 0;
+  }
+  .player-wrap .player-cover,
+  .player-wrap .equalizer {
+    display: none;
+  }
+  .player-wrap .player-info {
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+  .player-wrap .player-info strong {
+    font-size: 13px;
+  }
+  .player-wrap .player-controls {
+    margin: 0;
+  }
+  .player-wrap .play-button {
+    width: 40px;
+    height: 40px;
+  }
+  .player-wrap .player-info > span:last-child {
+    font-size: 9px;
+  }
+  .player-wrap .player-controls .volume,
+  .player-wrap .control-divider,
+  .player-wrap .fullscreen-button {
+    display: none;
+  }
+  main section[id] {
+    scroll-margin-top: 170px;
+  }
+  .listener-poll {
+    grid-template-columns: 1fr;
+    gap: 27px;
+    padding: 26px 20px;
+  }
+  .poll-intro h2 {
+    font-size: 35px;
+  }
+  .poll-intro h2 br {
+    display: none;
+  }
+  .poll-intro h2 span {
+    margin-left: 5px;
+  }
+  .poll-intro p {
+    max-width: none;
+  }
+  .poll-note {
+    margin-top: 14px;
+  }
+  .poll-panel h3 {
+    font-size: 19px;
+  }
+  .poll-actions {
+    gap: 15px;
+  }
+  .news-section .section-heading h2 {
+    font-size: 29px;
+  }
+  .news-section .section-heading > .text-action {
+    font-size: 10px;
+  }
+  .news-section {
+    margin-top: 38px;
+  }
+}
+@media (max-width: 390px) {
+  .player-wrap {
+    padding: 0 14px;
+  }
+  .player-wrap .radio-player {
+    gap: 10px;
+  }
+  .player-wrap .player-controls {
+    gap: 2px;
+  }
+  .player-wrap .player-controls .icon-button {
+    width: 29px;
+  }
+  .poll-actions {
+    gap: 10px;
+  }
+  .poll-actions .text-action {
+    font-size: 10px;
+  }
+}
+.news-illustration {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, .8);
+  color: #ddd;
+  font-size: 10px;
+}

@@ -8,7 +8,6 @@ import {
 import {
   ArrowDown,
   ArrowRight,
-  CalendarDays,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -31,15 +30,17 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
-import { programs, playlists, stories } from "./content";
+import { programs, playlists } from "./content";
 import { safeUrl, supabase, type RadioSettings } from "./lib";
+import { ListenerPoll, NewsFeed } from "./PublicFeatures";
 
-type ModalContent = { title: string; eyebrow?: string; body: ReactNode };
+export type ModalContent = { title: string; eyebrow?: string; body: ReactNode };
 const navigation = [
   ["Início", "#inicio"],
   ["Programas", "#programacao"],
   ["Notícias", "#noticias"],
   ["Playlists", "#playlists"],
+  ["Enquete", "#enquete"],
 ] as const;
 const slides = [
   {
@@ -80,7 +81,7 @@ const slides = [
   },
 ];
 
-function Brand({ large = false }: { large?: boolean }) {
+export function Brand({ large = false }: { large?: boolean }) {
   return (
     <span
       className={`brand ${large ? "brand-large" : ""}`}
@@ -93,7 +94,7 @@ function Brand({ large = false }: { large?: boolean }) {
   );
 }
 
-function Modal({
+export function Modal({
   content,
   close,
 }: {
@@ -137,16 +138,37 @@ function Modal({
 
 function SearchContent({ open }: { open: (content: ModalContent) => void }) {
   const [query, setQuery] = useState("");
+  const [news, setNews] = useState<
+    { title: string; body: string; source_url: string | null }[]
+  >([]);
+  useEffect(() => {
+    let mounted = true;
+    if (supabase)
+      void supabase
+        .from("news_posts")
+        .select("title,body,source_url")
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .limit(30)
+        .then(({ data }) => {
+          if (mounted) setNews(data || []);
+        });
+    return () => {
+      mounted = false;
+    };
+  }, []);
   const items = [
     ...programs.map((item) => ({
       title: item.title,
       type: "Programa",
       text: item.description,
+      url: null,
     })),
-    ...stories.map((item) => ({
+    ...news.map((item) => ({
       title: item.title,
-      type: "Editorial · demonstração",
+      type: "Notícia",
       text: item.body,
+      url: safeUrl(item.source_url),
     })),
   ];
   const normalized = (value: string) =>
@@ -181,7 +203,24 @@ function SearchContent({ open }: { open: (content: ModalContent) => void }) {
                 open({
                   title: item.title,
                   eyebrow: item.type,
-                  body: <p>{item.text}</p>,
+                  body: (
+                    <>
+                      <p>
+                        {item.text ||
+                          "Confira a notícia no veículo responsável pela publicação."}
+                      </p>
+                      {"url" in item && item.url && (
+                        <a
+                          className="yellow-button"
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Ler na fonte original <ArrowRight size={16} />
+                        </a>
+                      )}
+                    </>
+                  ),
                 })
               }
             >
@@ -311,7 +350,7 @@ function Newsletter({ openPrivacy }: { openPrivacy: () => void }) {
   );
 }
 
-function Player({
+export function Player({
   settings,
   open,
   close,
@@ -356,11 +395,7 @@ function Player({
               Enquanto isso, conheça a proposta da programação e explore os
               estilos que fazem parte do nosso universo.
             </p>
-            <a
-              className="yellow-button"
-              href="#programacao"
-              onClick={close}
-            >
+            <a className="yellow-button" href="#programacao" onClick={close}>
               Conhecer a programação <ArrowRight size={17} />
             </a>
           </>
@@ -558,14 +593,12 @@ export default function App() {
     };
   }, []);
   function listen() {
-    document
-      .querySelector("#player")
-      ?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "instant"
-          : "smooth",
-        block: "center",
-      });
+    document.querySelector("#player")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+      block: "center",
+    });
     document.querySelector<HTMLButtonElement>(".play-button")?.click();
   }
   function about() {
@@ -632,6 +665,13 @@ export default function App() {
             consentimento no Supabase. Esses dados não ficam disponíveis para
             visitantes e não são vendidos. Não usamos cookies de publicidade ou
             ferramentas de rastreamento nesta versão.
+          </p>
+          <p>
+            A enquete usa um identificador anônimo no navegador e um cookie
+            necessário para evitar votos repetidos. Guardamos o voto e um código
+            derivado do endereço de conexão para limitar abusos; o endereço IP
+            não é armazenado em texto aberto. Somente os totais das alternativas
+            ficam públicos.
           </p>
           <p>
             O site usa fontes do Google e hospedagem da Vercel, que podem
@@ -857,6 +897,7 @@ export default function App() {
           </div>
         </div>
       </header>
+      <Player settings={settings} open={open} close={() => setModal(null)} />
       <main id="conteudo">
         <section
           className={`hero hero-${current.image}`}
@@ -933,7 +974,6 @@ export default function App() {
           </a>
         </section>
         <div className="container page-content">
-          <Player settings={settings} open={open} close={() => setModal(null)} />
           <section className="promo-row" aria-label="Aplicativo e publicidade">
             <button
               className="app-promo"
@@ -1176,61 +1216,8 @@ export default function App() {
               ))}
             </div>
           </section>
-          <section className="content-section news-section" id="noticias">
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">O QUE MOVE A CULTURA</span>
-                <h2>
-                  DIRETO <span>DA CENA</span>
-                </h2>
-              </div>
-              <span className="editorial-note">
-                EDITORIAL EM PREPARAÇÃO <span className="yellow-dot" />
-              </span>
-            </div>
-            <div className="news-grid">
-              {stories.map((item) => (
-                <button
-                  className="news-card"
-                  key={item.title}
-                  onClick={() =>
-                    open({
-                      title: item.title,
-                      eyebrow: `${item.category} · CONTEÚDO DEMONSTRATIVO`,
-                      body: (
-                        <>
-                          <img
-                            className="modal-image"
-                            src={`/images/${item.image}.webp`}
-                            alt=""
-                          />
-                          <p>{item.body}</p>
-                        </>
-                      ),
-                    })
-                  }
-                >
-                  <div className="news-image">
-                    <img
-                      src={`/images/${item.image}.webp`}
-                      alt=""
-                      loading="lazy"
-                    />
-                    <span className="tag">{item.category}</span>
-                  </div>
-                  <div className="news-content">
-                    <h3>{item.title}</h3>
-                    <div>
-                      <span>
-                        <CalendarDays size={13} /> Conteúdo de demonstração
-                      </span>
-                      <ArrowRight size={17} />
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
+          <ListenerPoll />
+          <NewsFeed open={open} />
         </div>
       </main>
       <footer className="footer">

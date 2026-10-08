@@ -118,7 +118,9 @@ test("newsletter requires consent, submits correct data and renders success with
   ).toBeDisabled();
   await page.locator(".consent input").check();
   await page.getByRole("button", { name: "Cadastrar e-mail" }).click();
-  await expect(page.getByRole("status")).toContainText("Você está na lista!");
+  await expect(page.locator(".newsletter [role=status]")).toContainText(
+    "Você está na lista!",
+  );
   expect(payload).toEqual({ email: "ouvinte@example.com", consent: true });
 });
 
@@ -138,7 +140,7 @@ test("newsletter request failure provides a retryable error without a false succ
     .fill("ouvinte@example.com");
   await page.locator(".consent input").check();
   await page.getByRole("button", { name: "Cadastrar e-mail" }).click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.locator(".newsletter [role=status]")).toContainText(
     "Não foi possível cadastrar",
   );
   await expect(
