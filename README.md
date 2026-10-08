@@ -27,6 +27,8 @@ npm test
 
 - Layout preto e amarelo responsivo, carrossel, busca, programação, playlists, galeria e espaços publicitários.
 - Player fixo abaixo do cabeçalho, com uma única instância de áudio, pausa, volume, compartilhamento e tela cheia quando disponível.
+- Transições entre telas e janelas, carregamento com equalizador e zoom dos blocos ao entrar na tela. Respeita `prefers-reduced-motion`, revela conteúdo ao focar pelo teclado e mantém o player fora das animações de rolagem.
+- Gestão de banners no master: três espaços (aplicativo/topo, publicidade superior e principal), upload de JPG/PNG/WebP/GIF até 5 MB ou URL HTTPS, prévia, link, descrição acessível, ativação e restauração da chamada original. Mudanças aparecem ao abrir o site ou na próxima atualização de 60 segundos.
 - Notícias reais da Currents API em português, com categoria, autor/fonte, data e link original. Publicações manuais admitem conteúdo próprio e imagem HTTPS.
 - Enquete pública sem cadastro: opções, porcentagens, total de votos e confirmação de envio. Uma enquete ativa por vez.
 - Newsletter com consentimento e lista privada para o master.
@@ -70,6 +72,12 @@ Credenciais criptografadas no Supabase Vault:
 Uma restrição única por enquete/identificador evita votos repetidos no mesmo navegador; não verifica identidade pessoal, e limpar cookies/trocar navegador pode contornar a identificação. Opções ficam imutáveis após o primeiro voto. Encerrar ou ativar outra enquete preserva resultados. A interface pública recebe apenas totais agregados.
 
 O middleware do Vite atende a mesma API em desenvolvimento. `POLL_WRITE_SECRET` é exclusivamente do servidor e deve corresponder a `deluxe_poll_secret` no Vault. Nunca usar prefixo `VITE_` para segredos.
+
+## Banners
+
+`ad_banners` possui três posições fixas. Visitantes leem apenas espaços ativos; somente o master com sessão válida altera os dados. O bucket público `deluxe-banners` aceita imagens até 5 MB: arquivos são visíveis por URL, mas envio, listagem e remoção exigem master. Cada upload usa nome único para evitar sobrescritas e cache antigo. Remover a imagem do banner restaura a chamada original; arquivos anteriores permanecem no bucket, preservando referências existentes. Se a gravação falhar após um upload, o arquivo recém-enviado é removido.
+
+Dimensões recomendadas: 728 × 90 px nos dois espaços superiores e 1000 × 140 px no principal. Imagens se ajustam sem cortes. Desativar um espaço o oculta, incluindo a chamada original. Uma imagem externa indisponível usa a chamada original como alternativa. A migração `banner_management` já foi aplicada ao projeto Deluxe.
 
 ## Publicação
 

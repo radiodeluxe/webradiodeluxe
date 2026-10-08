@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, BarChart3, CalendarDays, Check, Vote } from "lucide-react";
 import { safeUrl, supabase } from "./lib";
 import type { ModalContent } from "./App";
+import { LoadingState } from "./Motion";
 
 export type NewsPost = {
   id: string;
@@ -156,7 +157,7 @@ export function ListenerPoll() {
       </div>
       <div className="poll-panel">
         {loading ? (
-          <p role="status">Carregando enquete…</p>
+          <LoadingState label="Carregando enquete…" />
         ) : error ? (
           <>
             <p role="alert">{error}</p>
@@ -283,7 +284,9 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
             alt=""
           />
           {!safeUrl(post.image_url) && (
-            <small className="source-attribution">Imagem ilustrativa da Deluxe</small>
+            <small className="source-attribution">
+              Imagem ilustrativa da Deluxe
+            </small>
           )}
           {post.body ? (
             post.body
@@ -346,9 +349,7 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
         </button>
       </div>
       {loading ? (
-        <p role="status" className="empty-state">
-          Buscando as últimas notícias…
-        </p>
+        <LoadingState label="Buscando as últimas notícias…" />
       ) : error ? (
         <p role="alert" className="empty-state">
           {error}
@@ -377,7 +378,9 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
                 />
                 <span className="tag">{post.category}</span>
                 {!safeUrl(post.image_url) && (
-                  <small className="news-illustration">Imagem ilustrativa</small>
+                  <small className="news-illustration">
+                    Imagem ilustrativa
+                  </small>
                 )}
               </div>
               <div className="news-content">

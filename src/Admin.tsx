@@ -1,5 +1,12 @@
 import { createClient, type Session } from "@supabase/supabase-js";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
+import { LoadingState, useScrollReveal } from "./Motion";
 import {
   ArrowRight,
   BarChart3,
@@ -9,6 +16,7 @@ import {
   Eye,
   EyeOff,
   Headphones,
+  Image,
   LayoutDashboard,
   LogOut,
   Mail,
@@ -32,6 +40,8 @@ import {
 } from "./PublicFeatures";
 import type { RadioSettings } from "./lib";
 import "./admin.css";
+import BannerManager from "./AdminBanners";
+import type { Banner } from "./Advertising";
 
 const client = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -47,11 +57,18 @@ const client = createClient(
   },
 );
 type Section =
-  "dashboard" | "news" | "polls" | "radio" | "subscribers" | "settings";
+  | "dashboard"
+  | "news"
+  | "polls"
+  | "banners"
+  | "radio"
+  | "subscribers"
+  | "settings";
 const modules = [
   { id: "dashboard", label: "Painel principal", icon: LayoutDashboard },
   { id: "news", label: "Notícias", icon: Newspaper },
   { id: "polls", label: "Enquetes", icon: Vote },
+  { id: "banners", label: "Banners", icon: Image },
   { id: "radio", label: "Player / transmissão", icon: Headphones },
   { id: "subscribers", label: "Newsletter", icon: Mail },
   { id: "settings", label: "Configurações", icon: Settings },
@@ -119,7 +136,7 @@ function Login({ onSession }: { onSession: (session: Session) => void }) {
     else onSession(result.data.session);
   }
   return (
-    <div className="admin-login">
+    <div className="admin-login page-enter">
       <div className="login-art">
         <Brand large />
         <span className="eyebrow">A CULTURA TEM VOZ.</span>
@@ -247,13 +264,7 @@ export default function Admin() {
       active = false;
     };
   }, [session?.access_token]);
-  if (!ready)
-    return (
-      <div className="admin-loading" role="status">
-        <Brand />
-        <RefreshCw className="spin" /> Validando acesso…
-      </div>
-    );
+  if (!ready) return <LoadingState fullscreen label="Validando acesso…" />;
   if (!session || !allowed)
     return (
       <>
@@ -274,7 +285,10 @@ function Panel({ email }: { email: string }) {
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const motionRoot = useRef<HTMLElement>(null);
+  useScrollReveal(motionRoot, section);
   const [news, setNews] = useState<NewsPost[]>([]),
+    [banners, setBanners] = useState<Banner[]>([]),
     [polls, setPolls] = useState<Poll[]>([]),
     [settings, setSettings] = useState<RadioSettings | null>(null),
     [automation, setAutomation] = useState<Automation | null>(null),
@@ -333,6 +347,7 @@ function Panel({ email }: { email: string }) {
         .from("news_posts")
         .select("id", { count: "exact", head: true })
         .eq("status", "published"),
+      client.from("ad_banners").select("*").order("id"),
     ]);
     if (responses.some((r) => r.error)) {
       setError("Não foi possível carregar todos os dados. Tente atualizar.");
@@ -346,6 +361,7 @@ function Panel({ email }: { email: string }) {
     setSubscribers((responses[5].data || []) as unknown as Subscriber[]);
     setSubscriberCount(responses[5].count || 0);
     setPublishedCount(responses[6].count || 0);
+    setBanners((responses[7].data || []) as unknown as Banner[]);
     const results = await Promise.all(
       (responses[1].data || []).map((p) =>
         client.rpc("poll_results", { p_id: (p as { id: string }).id }),
@@ -368,6 +384,7 @@ function Panel({ email }: { email: string }) {
     return () => window.removeEventListener("focus", verify);
   }, [reload]);
   function navigate(next: Section) {
+    window.scrollTo({ top: 0, behavior: "instant" });
     setSection(next);
     setMenu(false);
     setEditingNews(undefined);
@@ -513,7 +530,12 @@ function Panel({ email }: { email: string }) {
             </div>
           </div>
         </header>
-        <main className="admin-content">
+        <main
+          key={section}
+          className="admin-content page-enter"
+          ref={motionRoot}
+          aria-busy={loading}
+        >
           <div className="admin-page-heading">
             <div>
               <span className="eyebrow">DELUXE / CENTRAL DE CONTROLE</span>
@@ -528,6 +550,10 @@ function Panel({ email }: { email: string }) {
               Atualizar
             </button>
           </div>
+          {loading && <LoadingState label="Atualizando painel…" />}
+          {section === "banners" && (
+            <BannerManager client={client} banners={banners} saved={saved} />
+          )}
           {error && (
             <p className="admin-message error" role="alert">
               {error}
@@ -855,7 +881,9 @@ function Panel({ email }: { email: string }) {
                   disabled={!subscribers.length}
                   onClick={() => {
                     const cell = (value: string) => {
-                      const safe = /^[=+@\-\t\r]/.test(value) ? `'${value}` : value;
+                      const safe = /^[=+@\-\t\r]/.test(value)
+                        ? `'${value}`
+                        : value;
                       return `"${safe.replaceAll('"', '""')}"`;
                     };
                     const csv =

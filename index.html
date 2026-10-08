@@ -17,9 +17,72 @@
     />
     <link rel="preload" as="image" href="/images/hero.webp" />
     <title>Deluxe — O rap em alto nível</title>
+    <style>
+      .boot-loader {
+        min-height: 100svh;
+        background: #0c0c0c;
+        color: #b4bbb5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        font:
+          12px Arial,
+          sans-serif;
+      }
+      .boot-loader strong {
+        color: #ffcf00;
+        font-size: 26px;
+        letter-spacing: 4px;
+      }
+      .boot-wave {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: 30px;
+      }
+      .boot-wave i {
+        width: 4px;
+        height: 26px;
+        border-radius: 4px;
+        background: #ffcf00;
+        animation: boot-wave 850ms ease-in-out infinite alternate;
+      }
+      .boot-wave i:nth-child(even) {
+        animation-delay: -500ms;
+      }
+      .boot-wave i:nth-child(3) {
+        animation-delay: -250ms;
+      }
+      @keyframes boot-wave {
+        from {
+          transform: scaleY(0.25);
+          opacity: 0.5;
+        }
+        to {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-wave i {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-loader" role="status">
+        <strong>DELUXE</strong>
+        <div class="boot-wave" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span>Preparando sua frequência…</span>
+      </div>
+    </div>
+    <noscript>Ative o JavaScript para acessar a Web Rádio Deluxe.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

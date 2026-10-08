@@ -5,6 +5,8 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { useScrollReveal } from "./Motion";
+import { BannerSlot, useAdBanners } from "./Advertising";
 import {
   ArrowDown,
   ArrowRight,
@@ -117,7 +119,7 @@ export function Modal({
       }}
     >
       {content && (
-        <div className="dialog-content">
+        <div className="dialog-content" key={content.title}>
           <button
             className="icon-button dialog-close"
             aria-label="Fechar janela"
@@ -568,6 +570,9 @@ export function Player({
 }
 
 export default function App() {
+  const motionRoot = useRef<HTMLElement>(null);
+  useScrollReveal(motionRoot);
+  const banners = useAdBanners();
   const [menuOpen, setMenuOpen] = useState(false);
   const [slide, setSlide] = useState(0);
   const [modal, setModal] = useState<ModalContent | null>(null);
@@ -898,7 +903,7 @@ export default function App() {
         </div>
       </header>
       <Player settings={settings} open={open} close={() => setModal(null)} />
-      <main id="conteudo">
+      <main id="conteudo" ref={motionRoot} className="page-enter">
         <section
           className={`hero hero-${current.image}`}
           id="inicio"
@@ -975,54 +980,58 @@ export default function App() {
         </section>
         <div className="container page-content">
           <section className="promo-row" aria-label="Aplicativo e publicidade">
-            <button
-              className="app-promo"
-              onClick={() =>
-                open({
-                  title: "Leve a Deluxe com você.",
-                  eyebrow: "APLICATIVO · EM BREVE",
-                  body: (
-                    <>
-                      <p>
-                        O aplicativo da Web Rádio Deluxe está nos nossos planos.
-                        Enquanto ele não chega, este site já se adapta ao seu
-                        celular.
-                      </p>
-                      <p>
-                        Você pode adicionar o site à tela inicial pelo menu do
-                        seu navegador e acessar a Deluxe com mais facilidade.
-                      </p>
-                    </>
-                  ),
-                })
-              }
-            >
-              <span className="phone-illustration">
-                <Smartphone size={66} />
+            <BannerSlot slot="app" banners={banners}>
+              <button
+                className="app-promo"
+                onClick={() =>
+                  open({
+                    title: "Leve a Deluxe com você.",
+                    eyebrow: "APLICATIVO · EM BREVE",
+                    body: (
+                      <>
+                        <p>
+                          O aplicativo da Web Rádio Deluxe está nos nossos
+                          planos. Enquanto ele não chega, este site já se adapta
+                          ao seu celular.
+                        </p>
+                        <p>
+                          Você pode adicionar o site à tela inicial pelo menu do
+                          seu navegador e acessar a Deluxe com mais facilidade.
+                        </p>
+                      </>
+                    ),
+                  })
+                }
+              >
+                <span className="phone-illustration">
+                  <Smartphone size={66} />
+                  <span>
+                    <Crown size={17} />
+                    <b>D</b>
+                    <Play fill="currentColor" size={12} />
+                  </span>
+                </span>
                 <span>
-                  <Crown size={17} />
-                  <b>D</b>
-                  <Play fill="currentColor" size={12} />
+                  <small>NO SEU RITMO. EM TODO LUGAR.</small>
+                  <strong>
+                    LEVE A DELUXE <em>COM VOCÊ.</em>
+                  </strong>
+                  <span className="app-note">
+                    O seu próximo app favorito. <b>EM BREVE</b>
+                  </span>
                 </span>
-              </span>
-              <span>
-                <small>NO SEU RITMO. EM TODO LUGAR.</small>
+                <ArrowRight className="app-arrow" size={23} />
+              </button>
+            </BannerSlot>
+            <BannerSlot slot="top" banners={banners}>
+              <button className="ad-slot" onClick={() => contact(true)}>
+                <span>ESPAÇO PUBLICITÁRIO</span>
                 <strong>
-                  LEVE A DELUXE <em>COM VOCÊ.</em>
+                  SUA MARCA <ArrowUpRight /> AQUI
                 </strong>
-                <span className="app-note">
-                  O seu próximo app favorito. <b>EM BREVE</b>
-                </span>
-              </span>
-              <ArrowRight className="app-arrow" size={23} />
-            </button>
-            <button className="ad-slot" onClick={() => contact(true)}>
-              <span>ESPAÇO PUBLICITÁRIO</span>
-              <strong>
-                SUA MARCA <ArrowUpRight /> AQUI
-              </strong>
-              <small>Conecte-se à nossa audiência</small>
-            </button>
+                <small>Conecte-se à nossa audiência</small>
+              </button>
+            </BannerSlot>
           </section>
           <section className="benefits" aria-label="O universo Deluxe">
             {[
@@ -1131,22 +1140,24 @@ export default function App() {
               PROPOSTA DE PROGRAMAÇÃO · EM BREVE NA SUA FREQUÊNCIA
             </p>
           </section>
-          <section className="brand-banner" aria-label="Anuncie na Deluxe">
-            <div className="banner-image" />
-            <Target className="banner-target" strokeWidth={1.4} />
-            <div className="banner-copy">
-              <span className="eyebrow">FAÇA PARTE DO MOVIMENTO</span>
-              <h2>
-                SUA MARCA TEM
-                <br />
-                ESPAÇO <span>NA DELUXE.</span>
-              </h2>
-              <p>Uma conexão real com quem vive a cultura.</p>
-            </div>
-            <button className="yellow-button" onClick={() => contact(true)}>
-              ANUNCIE AQUI <ArrowRight size={19} />
-            </button>
-          </section>
+          <BannerSlot slot="main" banners={banners}>
+            <section className="brand-banner" aria-label="Anuncie na Deluxe">
+              <div className="banner-image" />
+              <Target className="banner-target" strokeWidth={1.4} />
+              <div className="banner-copy">
+                <span className="eyebrow">FAÇA PARTE DO MOVIMENTO</span>
+                <h2>
+                  SUA MARCA TEM
+                  <br />
+                  ESPAÇO <span>NA DELUXE.</span>
+                </h2>
+                <p>Uma conexão real com quem vive a cultura.</p>
+              </div>
+              <button className="yellow-button" onClick={() => contact(true)}>
+                ANUNCIE AQUI <ArrowRight size={19} />
+              </button>
+            </section>
+          </BannerSlot>
           <section className="content-section playlist-section" id="playlists">
             <div className="section-heading">
               <div>
