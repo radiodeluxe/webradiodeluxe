@@ -60,7 +60,7 @@ export default function BannerManager({
       </div>
       <p className="admin-table-note">
         Configure os três espaços do site. Envie uma imagem ou use uma URL
-        HTTPS. Sem imagem, o espaço exibe a chamada original da Deluxe.
+        HTTPS. Sem imagem, o espaço exibe a chamada original da JK HipHop.
         Desativar oculta o espaço.
       </p>
       {error && (
@@ -80,7 +80,7 @@ export default function BannerManager({
               ) : (
                 <div>
                   <Image size={30} />
-                  <span>Chamada original da Deluxe</span>
+                  <span>Chamada original da JK HipHop</span>
                 </div>
               )}
             </div>

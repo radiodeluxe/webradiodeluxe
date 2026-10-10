@@ -148,7 +148,7 @@ function Login({ onSession }: { onSession: (session: Session) => void }) {
         <p>
           Conteúdo, comunidade e música.
           <br />
-          Tudo conectado na Deluxe.
+          Tudo conectado na JK HipHop.
         </p>
         <a href="/" className="outline-button">
           Voltar ao site <ArrowRight size={17} />
@@ -164,7 +164,7 @@ function Login({ onSession }: { onSession: (session: Session) => void }) {
           <br />
           administrador.
         </h2>
-        <p>Entre para gerenciar a Web Rádio Deluxe.</p>
+        <p>Entre para gerenciar a Web Rádio JK HipHop.</p>
         <form onSubmit={submit}>
           <Field label="E-mail do administrador">
             <input
@@ -214,7 +214,7 @@ export default function Admin() {
     [allowed, setAllowed] = useState(false),
     [authError, setAuthError] = useState("");
   useEffect(() => {
-    document.title = "Admin Master | Web Rádio Deluxe";
+    document.title = "Admin Master | Web Rádio JK HipHop";
     const meta = document.createElement("meta");
     meta.name = "robots";
     meta.content = "noindex, nofollow";
@@ -451,7 +451,7 @@ function Panel({ email }: { email: string }) {
   return (
     <div className="admin-shell">
       <aside className={`admin-sidebar ${menu ? "open" : ""}`}>
-        <a className="admin-brand" href="/" aria-label="Deluxe, início">
+        <a className="admin-brand" href="/" aria-label="JK HipHop, início">
           <Brand />
         </a>
         <span className="sidebar-caption">CENTRAL DA RÁDIO</span>
@@ -538,7 +538,7 @@ function Panel({ email }: { email: string }) {
         >
           <div className="admin-page-heading">
             <div>
-              <span className="eyebrow">DELUXE / CENTRAL DE CONTROLE</span>
+              <span className="eyebrow">JK HIPHOP / CENTRAL DE CONTROLE</span>
               <h1>{current.label}</h1>
             </div>
             <button
@@ -652,7 +652,7 @@ function Panel({ email }: { email: string }) {
                           <small>
                             {post.origin === "currents"
                               ? "Currents API"
-                              : "Redação Deluxe"}{" "}
+                              : "Redação JK HipHop"}{" "}
                             · {formatDate(post.created_at)}
                           </small>
                         </span>
@@ -897,7 +897,7 @@ function Panel({ email }: { email: string }) {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
                     a.href = url;
-                    a.download = "deluxe-newsletter.csv";
+                    a.download = "jk-hiphop-newsletter.csv";
                     a.click();
                     URL.revokeObjectURL(url);
                   }}
@@ -940,7 +940,7 @@ function Panel({ email }: { email: string }) {
           )}
         </main>
         <footer className="admin-footer">
-          <span>© {new Date().getFullYear()} Web Rádio Deluxe</span>
+          <span>© {new Date().getFullYear()} Web Rádio JK HipHop</span>
           <span>RAP É CULTURA. RESPEITO É A BASE.</span>
         </footer>
       </div>

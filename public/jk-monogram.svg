@@ -1,0 +1,14 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 144 112"
+  role="img"
+  aria-labelledby="title"
+>
+  <title id="title">JK HipHop</title>
+  <g transform="translate(16 14) skewX(-8)" fill="#ffcf00">
+    <path
+      d="M9 0h47v51c0 20-11 30-29 30C10 81 1 72 1 55V45h17v10c0 8 3 12 9 12s11-4 11-13V16H9Z"
+    />
+    <path d="M64 0h17v31L104 0h21L96 38l30 41h-22L81 46v33H64Z" />
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 export const programs = [
   {
-    title: "Resenha Deluxe",
+    title: "Resenha JK HipHop",
     time: "08H — 09H",
     days: "SEG A SEX",
     image: "rapper",
@@ -89,7 +89,7 @@ export const stories = [
     title: "O rap nacional é a voz de uma geração",
     category: "NA CENA",
     image: "rapper",
-    body: "Das ruas aos fones de ouvido, o rap é um espaço de expressão, identidade e transformação. A Deluxe nasce para valorizar essa cultura e aproximar quem faz música de quem vive o movimento. Este é um conteúdo de demonstração para apresentar o futuro espaço editorial da rádio.",
+    body: "Das ruas aos fones de ouvido, o rap é um espaço de expressão, identidade e transformação. A JK HipHop nasce para valorizar essa cultura e aproximar quem faz música de quem vive o movimento. Este é um conteúdo de demonstração para apresentar o futuro espaço editorial da rádio.",
   },
   {
     title: "Batalhas de rima: onde a cultura acontece",
@@ -101,6 +101,6 @@ export const stories = [
     title: "Muito além da música. Um movimento.",
     category: "MOVIMENTO",
     image: "city",
-    body: "Música, arte, dança e respeito. O hip hop reúne linguagens que atravessam gerações e cidades. A Rádio Deluxe quer fazer parte dessa conexão, levando cultura para sua rotina. Conteúdo demonstrativo, preparado para aprovação da identidade visual do site.",
+    body: "Música, arte, dança e respeito. O hip hop reúne linguagens que atravessam gerações e cidades. A Rádio JK HipHop quer fazer parte dessa conexão, levando cultura para sua rotina. Conteúdo demonstrativo, preparado para aprovação da identidade visual do site.",
   },
 ];

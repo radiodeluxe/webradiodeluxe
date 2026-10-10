@@ -13,7 +13,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Crown,
   Diamond,
   Headphones,
   LoaderCircle,
@@ -83,15 +82,24 @@ const slides = [
   },
 ];
 
-export function Brand({ large = false }: { large?: boolean }) {
+export function Brand({
+  large = false,
+  compact = false,
+}: {
+  large?: boolean;
+  compact?: boolean;
+}) {
   return (
     <span
       className={`brand ${large ? "brand-large" : ""}`}
-      aria-label="Deluxe Web Rádio"
+      aria-label="JK HipHop Web Rádio"
     >
-      <Crown aria-hidden="true" />
-      <span className="brand-name">Deluxe</span>
-      <span className="brand-subtitle">WEB RÁDIO</span>
+      <img
+        src={compact ? "/jk-monogram.svg" : "/logo-jk-hiphop.svg"}
+        alt=""
+        width={compact ? 144 : 310}
+        height={compact ? 112 : 104}
+      />
     </span>
   );
 }
@@ -128,7 +136,7 @@ export function Modal({
             <X />
           </button>
           <span className="eyebrow">
-            {content.eyebrow || "WEB RÁDIO DELUXE"}
+            {content.eyebrow || "WEB RÁDIO JK HIPHOP"}
           </span>
           <h2>{content.title}</h2>
           {content.body}
@@ -275,7 +283,7 @@ function Newsletter({ openPrivacy }: { openPrivacy: () => void }) {
     <form onSubmit={submit} className="newsletter">
       <h3>NA FREQUÊNCIA DAS NOVIDADES</h3>
       <p>
-        Receba o que acontece na Deluxe.
+        Receba o que acontece na JK HipHop.
         <br />
         Sem ruído. Só o que importa.
       </p>
@@ -390,8 +398,8 @@ export function Player({
         body: (
           <>
             <p>
-              Estamos preparando a frequência da Deluxe. O player será ativado
-              assim que a transmissão da rádio estiver disponível.
+              Estamos preparando a frequência da JK HipHop. O player será
+              ativado assim que a transmissão da rádio estiver disponível.
             </p>
             <p>
               Enquanto isso, conheça a proposta da programação e explore os
@@ -424,13 +432,13 @@ export function Player({
     try {
       if (navigator.share)
         await navigator.share({
-          title: "Web Rádio Deluxe",
+          title: "Web Rádio JK HipHop",
           text: "O rap em alto nível.",
           url,
         });
       else {
         await navigator.clipboard.writeText(url);
-        setFeedback("Link da Deluxe copiado!");
+        setFeedback("Link da JK HipHop copiado!");
       }
     } catch (error) {
       if (!(error instanceof DOMException && error.name === "AbortError"))
@@ -449,7 +457,7 @@ export function Player({
     <div className="player-wrap" id="player">
       <div className="radio-player" ref={panel}>
         <div className="player-cover">
-          <Brand />
+          <Brand compact />
         </div>
         <button
           className="play-button"
@@ -488,7 +496,7 @@ export function Player({
                 ? "PRONTA PARA TOCAR"
                 : "EM BREVE · AO VIVO"}
           </span>
-          <strong>Web Rádio Deluxe</strong>
+          <strong>Web Rádio JK HipHop</strong>
           <span>
             {playing
               ? "Você está na frequência do rap."
@@ -612,9 +620,9 @@ export default function App() {
       body: (
         <>
           <p>
-            A Deluxe nasce da conexão entre música, cultura e respeito. Um lugar
-            para quem vive o rap, reconhece suas raízes e quer descobrir o que
-            vem a seguir.
+            A JK HipHop nasce da conexão entre música, cultura e respeito. Um
+            lugar para quem vive o rap, reconhece suas raízes e quer descobrir o
+            que vem a seguir.
           </p>
           <p>
             Rap nacional e internacional, clássicos, boom bap e novas vozes. Sem
@@ -630,12 +638,12 @@ export default function App() {
   function contact(ad = false) {
     open({
       title: ad ? "Sua marca na nossa frequência." : "Vamos trocar uma ideia?",
-      eyebrow: ad ? "ANUNCIE NA DELUXE" : "CONTATO",
+      eyebrow: ad ? "ANUNCIE NA JK HIPHOP" : "CONTATO",
       body: (
         <>
           <p>
             {ad
-              ? "Conecte sua marca a quem vive a música e a cultura hip hop. Os espaços de publicidade da Deluxe estão sendo preparados para parcerias que fazem sentido para o movimento."
+              ? "Conecte sua marca a quem vive a música e a cultura hip hop. Os espaços de publicidade da JK HipHop estão sendo preparados para parcerias que fazem sentido para o movimento."
               : "Artistas, produtores, ouvintes e parceiros: queremos construir essa conexão com você."}
           </p>
           {settings?.contact_email ? (
@@ -643,7 +651,7 @@ export default function App() {
               className="yellow-button"
               href={`mailto:${settings.contact_email}`}
             >
-              <Mail size={18} /> Falar com a Deluxe
+              <Mail size={18} /> Falar com a JK HipHop
             </a>
           ) : (
             <p className="modal-highlight">
@@ -661,7 +669,7 @@ export default function App() {
       body: (
         <>
           <p>
-            Ao se cadastrar, você autoriza a Web Rádio Deluxe a guardar seu
+            Ao se cadastrar, você autoriza a Web Rádio JK HipHop a guardar seu
             e-mail e enviar novidades da rádio. O cadastro é opcional e depende
             do seu consentimento.
           </p>
@@ -704,8 +712,8 @@ export default function App() {
         title: "O movimento também está nas redes.",
         body: (
           <p>
-            Os canais oficiais da Deluxe serão divulgados em breve. Cadastre seu
-            e-mail no rodapé para acompanhar as novidades.
+            Os canais oficiais da JK HipHop serão divulgados em breve. Cadastre
+            seu e-mail no rodapé para acompanhar as novidades.
           </p>
         ),
       });
@@ -737,7 +745,7 @@ export default function App() {
   function playlist(item: (typeof playlists)[number]) {
     open({
       title: item.title,
-      eyebrow: "UNIVERSO DELUXE",
+      eyebrow: "UNIVERSO JK HIPHOP",
       body: (
         <>
           <img
@@ -747,7 +755,7 @@ export default function App() {
           />
           <p>
             {item.subtitle}. Esta categoria faz parte da curadoria que estamos
-            preparando para a Deluxe.
+            preparando para a JK HipHop.
           </p>
           <p>
             A playlist oficial será publicada em breve. Enquanto isso, explore
@@ -773,7 +781,11 @@ export default function App() {
       </a>
       <header className="header">
         <div className="header-inner">
-          <a href="#inicio" className="logo-link" aria-label="Deluxe, início">
+          <a
+            href="#inicio"
+            className="logo-link"
+            aria-label="JK HipHop, início"
+          >
             <Brand />
           </a>
           <nav
@@ -798,8 +810,8 @@ export default function App() {
                   body: (
                     <>
                       <p>
-                        Estamos reunindo a equipe que vai dar vida à Deluxe. Em
-                        breve, você conhecerá nossos apresentadores, DJs e
+                        Estamos reunindo a equipe que vai dar vida à JK HipHop.
+                        Em breve, você conhecerá nossos apresentadores, DJs e
                         colaboradores.
                       </p>
                       <p>
@@ -821,7 +833,7 @@ export default function App() {
                     <>
                       <p>
                         Imagens conceituais criadas com IA para apresentar o
-                        universo visual da Deluxe.
+                        universo visual da JK HipHop.
                       </p>
                       <div className="gallery">
                         {[
@@ -875,14 +887,14 @@ export default function App() {
             <span className="header-social">
               <button
                 className="icon-button"
-                aria-label="Instagram da Deluxe"
+                aria-label="Instagram da JK HipHop"
                 onClick={() => social("instagram")}
               >
                 <Instagram size={18} />
               </button>
               <button
                 className="icon-button"
-                aria-label="YouTube da Deluxe"
+                aria-label="YouTube da JK HipHop"
                 onClick={() => social("youtube")}
               >
                 <Youtube size={19} />
@@ -908,7 +920,7 @@ export default function App() {
           className={`hero hero-${current.image}`}
           id="inicio"
           aria-roledescription="carrossel"
-          aria-label="Destaques Deluxe"
+          aria-label="Destaques JK HipHop"
         >
           <div
             className="hero-image"
@@ -926,7 +938,7 @@ export default function App() {
               <p>{current.copy}</p>
               <div className="hero-buttons">
                 <button className="yellow-button" onClick={listen}>
-                  <Play size={17} fill="currentColor" /> OUÇA A DELUXE
+                  <Play size={17} fill="currentColor" /> OUÇA A JK HIPHOP
                 </button>
                 <button className="outline-button" onClick={about}>
                   CONHEÇA A RÁDIO <ArrowRight size={17} />
@@ -985,18 +997,19 @@ export default function App() {
                 className="app-promo"
                 onClick={() =>
                   open({
-                    title: "Leve a Deluxe com você.",
+                    title: "Leve a JK HipHop com você.",
                     eyebrow: "APLICATIVO · EM BREVE",
                     body: (
                       <>
                         <p>
-                          O aplicativo da Web Rádio Deluxe está nos nossos
+                          O aplicativo da Web Rádio JK HipHop está nos nossos
                           planos. Enquanto ele não chega, este site já se adapta
                           ao seu celular.
                         </p>
                         <p>
                           Você pode adicionar o site à tela inicial pelo menu do
-                          seu navegador e acessar a Deluxe com mais facilidade.
+                          seu navegador e acessar a JK HipHop com mais
+                          facilidade.
                         </p>
                       </>
                     ),
@@ -1006,15 +1019,19 @@ export default function App() {
                 <span className="phone-illustration">
                   <Smartphone size={66} />
                   <span>
-                    <Crown size={17} />
-                    <b>D</b>
+                    <img
+                      src="/jk-monogram.svg"
+                      alt=""
+                      width="144"
+                      height="112"
+                    />
                     <Play fill="currentColor" size={12} />
                   </span>
                 </span>
                 <span>
                   <small>NO SEU RITMO. EM TODO LUGAR.</small>
                   <strong>
-                    LEVE A DELUXE <em>COM VOCÊ.</em>
+                    LEVE A JK HIPHOP <em>COM VOCÊ.</em>
                   </strong>
                   <span className="app-note">
                     O seu próximo app favorito. <b>EM BREVE</b>
@@ -1033,7 +1050,7 @@ export default function App() {
               </button>
             </BannerSlot>
           </section>
-          <section className="benefits" aria-label="O universo Deluxe">
+          <section className="benefits" aria-label="O universo JK HipHop">
             {[
               {
                 icon: Headphones,
@@ -1082,7 +1099,7 @@ export default function App() {
                     body: (
                       <>
                         <p>
-                          Esta é a proposta inicial da programação da Deluxe.
+                          Esta é a proposta inicial da programação da JK HipHop.
                           Horários e programas serão confirmados antes da
                           estreia.
                         </p>
@@ -1141,7 +1158,7 @@ export default function App() {
             </p>
           </section>
           <BannerSlot slot="main" banners={banners}>
-            <section className="brand-banner" aria-label="Anuncie na Deluxe">
+            <section className="brand-banner" aria-label="Anuncie na JK HipHop">
               <div className="banner-image" />
               <Target className="banner-target" strokeWidth={1.4} />
               <div className="banner-copy">
@@ -1149,7 +1166,7 @@ export default function App() {
                 <h2>
                   SUA MARCA TEM
                   <br />
-                  ESPAÇO <span>NA DELUXE.</span>
+                  ESPAÇO <span>NA JK HIPHOP.</span>
                 </h2>
                 <p>Uma conexão real com quem vive a cultura.</p>
               </div>
@@ -1163,7 +1180,7 @@ export default function App() {
               <div>
                 <span className="eyebrow">APERTE O PLAY NO SEU ESTILO</span>
                 <h2>
-                  UNIVERSO <span>DELUXE</span>
+                  UNIVERSO <span>JK HIPHOP</span>
                 </h2>
               </div>
               <div className="carousel-arrows">
@@ -1218,7 +1235,7 @@ export default function App() {
                       <Play fill="currentColor" size={20} />
                     </span>
                     <span className="playlist-type">
-                      <Music2 size={13} /> SELEÇÃO DELUXE
+                      <Music2 size={13} /> SELEÇÃO JK HIPHOP
                     </span>
                   </div>
                   <strong>{item.title}</strong>
@@ -1234,7 +1251,7 @@ export default function App() {
       <footer className="footer">
         <div className="container footer-main">
           <div className="footer-brand">
-            <a href="#inicio" aria-label="Deluxe, início">
+            <a href="#inicio" aria-label="JK HipHop, início">
               <Brand />
             </a>
             <p>
@@ -1246,21 +1263,21 @@ export default function App() {
             <div className="footer-social">
               <button
                 className="icon-button"
-                aria-label="Instagram da Deluxe"
+                aria-label="Instagram da JK HipHop"
                 onClick={() => social("instagram")}
               >
                 <Instagram size={19} />
               </button>
               <button
                 className="icon-button"
-                aria-label="YouTube da Deluxe"
+                aria-label="YouTube da JK HipHop"
                 onClick={() => social("youtube")}
               >
                 <Youtube size={19} />
               </button>
               <button
                 className="icon-button"
-                aria-label="Contato da Deluxe"
+                aria-label="Contato da JK HipHop"
                 onClick={() => contact()}
               >
                 <Mail size={19} />
@@ -1268,7 +1285,7 @@ export default function App() {
             </div>
           </div>
           <div className="footer-links">
-            <h3>EXPLORE A DELUXE</h3>
+            <h3>EXPLORE A JK HIPHOP</h3>
             {navigation.map(([label, href]) => (
               <a key={label} href={href}>
                 {label}
@@ -1290,7 +1307,7 @@ export default function App() {
         </div>
         <div className="container footer-bottom">
           <span>
-            © {new Date().getFullYear()} Web Rádio Deluxe. Todos os direitos
+            © {new Date().getFullYear()} Web Rádio JK HipHop. Todos os direitos
             reservados.
           </span>
           <button onClick={privacy}>Privacidade</button>

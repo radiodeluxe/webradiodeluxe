@@ -1,5 +1,4 @@
 import { useEffect, type RefObject } from "react";
-import { Crown } from "lucide-react";
 
 export function LoadingState({
   label = "Carregando…",
@@ -13,7 +12,15 @@ export function LoadingState({
       className={`deluxe-loader ${fullscreen ? "loader-screen" : ""}`}
       role="status"
     >
-      {fullscreen && <Crown className="loader-crown" aria-hidden="true" />}
+      {fullscreen && (
+        <img
+          src="/jk-monogram.svg"
+          className="loader-crown"
+          alt="JK HipHop"
+          width="144"
+          height="112"
+        />
+      )}
       <div className="loader-wave" aria-hidden="true">
         {Array.from({ length: 5 }, (_, i) => (
           <i key={i} />

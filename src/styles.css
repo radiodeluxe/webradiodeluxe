@@ -190,38 +190,15 @@ p {
   margin-right: auto;
 }
 .brand {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  flex-direction: column;
+  flex-shrink: 0;
   width: 127px;
-  padding-top: 9px;
-  color: #fff;
-  transform: rotate(-4deg);
 }
-.brand > svg {
-  position: absolute;
-  width: 27px;
-  height: 24px;
-  top: -8px;
-  left: 61px;
-  color: var(--yellow);
-  transform: rotate(9deg);
-}
-.brand-name {
-  font:
-    400 37px/0.95 "Permanent Marker",
-    cursive;
-  letter-spacing: -3px;
-}
-.brand-subtitle {
-  font:
-    600 6px/1 Inter,
-    sans-serif;
-  letter-spacing: 3.5px;
-  margin-top: 7px;
-  margin-left: 18px;
-  transform: rotate(4deg);
+.brand > img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .navigation {
   display: flex;
@@ -335,25 +312,7 @@ p {
   width: 285px;
   margin-top: 22px;
   align-items: flex-start;
-  padding-top: 10px;
-}
-.brand-large > .brand-name {
-  font-size: 84px;
-  letter-spacing: -7px;
-  line-height: 0.95;
-}
-.brand-large > .brand-subtitle {
-  font-size: 11px;
-  letter-spacing: 7px;
-  margin-left: 52px;
-  margin-top: 14px;
-}
-.brand-large > svg {
-  height: 43px;
-  width: 49px;
-  top: -24px;
-  left: 134px;
-  stroke-width: 1.7;
+  padding-top: 0;
 }
 .hero h1 {
   font: 800 62px/0.95 var(--heading);
@@ -472,8 +431,7 @@ p {
   overflow: hidden;
 }
 .player-cover .brand {
-  transform: scale(0.46) rotate(-4deg);
-  width: 125px;
+  width: 55px;
 }
 .play-button {
   height: 47px;
@@ -681,11 +639,10 @@ p {
   color: var(--yellow);
   gap: 2px;
 }
-.phone-illustration > span b {
-  font:
-    24px/1 "Permanent Marker",
-    cursive;
-  color: #fff;
+.phone-illustration > span img {
+  display: block;
+  width: 30px;
+  height: auto;
 }
 .ad-slot {
   border: 1px solid #575039;
@@ -1549,13 +1506,6 @@ p {
   .header .brand {
     width: 105px;
   }
-  .header .brand-name {
-    font-size: 32px;
-  }
-  .header .brand > svg {
-    left: 51px;
-    width: 24px;
-  }
   .header-listen {
     margin-left: 0;
     padding: 0 10px;
@@ -1896,20 +1846,6 @@ p {
   .header .brand {
     width: 94px;
   }
-  .header .brand-name {
-    font-size: 30px;
-  }
-  .header .brand-subtitle {
-    font-size: 5px;
-    letter-spacing: 2.5px;
-    margin-left: 10px;
-  }
-  .header .brand > svg {
-    left: 44px;
-    width: 22px;
-    height: 21px;
-    top: -5px;
-  }
   .header-listen {
     font-size: 12px;
     min-height: 35px;
@@ -1941,17 +1877,6 @@ p {
   .brand-large {
     margin-top: 44px;
     width: 255px;
-  }
-  .brand-large > .brand-name {
-    font-size: 80px;
-  }
-  .brand-large > svg {
-    left: 131px;
-    height: 40px;
-    top: -23px;
-  }
-  .brand-large > .brand-subtitle {
-    font-size: 10px;
   }
   .hero h1 {
     font-size: 62px;
@@ -2349,9 +2274,6 @@ p {
   .hero {
     height: 560px;
   }
-  .brand-large > .brand-name {
-    font-size: 73px;
-  }
   .app-promo {
     padding: 13px;
     gap: 12px;
@@ -2638,6 +2560,7 @@ main section[id] {
     padding: 0 20px;
   }
   .player-wrap .radio-player {
+    display: flex;
     height: 72px;
     min-height: 72px;
     gap: 14px;
@@ -2654,9 +2577,18 @@ main section[id] {
   }
   .player-wrap .player-info strong {
     font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player-wrap .live-status {
+    white-space: nowrap;
   }
   .player-wrap .player-controls {
     margin: 0;
+    flex-shrink: 0;
+    border: 0;
+    padding: 0;
   }
   .player-wrap .play-button {
     width: 40px;

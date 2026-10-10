@@ -119,7 +119,7 @@ export function ListenerPoll() {
       setMessage(
         data.already_voted
           ? "Seu voto já foi registrado nesta enquete."
-          : "Voto registrado. Sua voz faz parte da Deluxe!",
+          : "Voto registrado. Sua voz faz parte da JK HipHop!",
       );
       try {
         localStorage.setItem(`deluxe-vote:${poll.id}`, "true");
@@ -285,7 +285,7 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
           />
           {!safeUrl(post.image_url) && (
             <small className="source-attribution">
-              Imagem ilustrativa da Deluxe
+              Imagem ilustrativa da JK HipHop
             </small>
           )}
           {post.body ? (
@@ -393,7 +393,7 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
                   <ArrowRight size={17} />
                 </div>
                 <small className="source-attribution">
-                  {post.source_name || "Redação Deluxe"}
+                  {post.source_name || "Redação JK HipHop"}
                 </small>
               </div>
             </button>

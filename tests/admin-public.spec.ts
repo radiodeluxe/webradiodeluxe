@@ -15,6 +15,11 @@ for (const width of [320, 390, 768, 1440]) {
     expect(player).not.toBeNull();
     expect(player!.y).toBeGreaterThanOrEqual(header!.height - 2);
     expect(player!.y).toBeLessThanOrEqual(header!.height + 15);
+    const info = await page.locator(".player-info").boundingBox();
+    expect(info!.y).toBeGreaterThanOrEqual(player!.y);
+    expect(info!.y + info!.height).toBeLessThanOrEqual(
+      player!.y + player!.height,
+    );
     expect(await page.locator("audio").count()).toBe(1);
   });
 }

@@ -1,6 +1,6 @@
-# Web Rádio Deluxe
+# JK HipHop — Web Rádio
 
-Site React + TypeScript + Vite da Deluxe, com painel exclusivo do administrador master, Supabase e publicação na Vercel.
+Site React + TypeScript + Vite da JK HipHop, com painel exclusivo do administrador master, Supabase e publicação na Vercel. A identidade usa `public/logo-jk-hiphop.svg`, com monograma compacto em `public/jk-monogram.svg` e favicon correspondente. Os identificadores técnicos existentes de hospedagem, autenticação e banco são preservados.
 
 - Site: https://webradiodeluxe.vercel.app
 - Painel: https://webradiodeluxe.vercel.app/admin
@@ -75,7 +75,7 @@ O middleware do Vite atende a mesma API em desenvolvimento. `POLL_WRITE_SECRET` 
 
 ## Banners
 
-`ad_banners` possui três posições fixas. Visitantes leem apenas espaços ativos; somente o master com sessão válida altera os dados. O bucket público `deluxe-banners` aceita imagens até 5 MB: arquivos são visíveis por URL, mas envio, listagem e remoção exigem master. Cada upload usa nome único para evitar sobrescritas e cache antigo. Remover a imagem do banner restaura a chamada original; arquivos anteriores permanecem no bucket, preservando referências existentes. Se a gravação falhar após um upload, o arquivo recém-enviado é removido.
+`ad_banners` possui três posições fixas. Visitantes leem apenas espaços ativos; somente o master com sessão válida altera os dados. O bucket público `deluxe-banners` aceita imagens até 5 MB: arquivos são visíveis por URL, mas envio, listagem e remoção exigem master. Cada upload usa nome único para evitar sobrescritas e cache antigo. Remover a imagem do banner restaura a chamada original da JK HipHop; arquivos anteriores permanecem no bucket, preservando referências existentes. Se a gravação falhar após um upload, o arquivo recém-enviado é removido.
 
 Dimensões recomendadas: 728 × 90 px nos dois espaços superiores e 1000 × 140 px no principal. Imagens se ajustam sem cortes. Desativar um espaço o oculta, incluindo a chamada original. Uma imagem externa indisponível usa a chamada original como alternativa. A migração `banner_management` já foi aplicada ao projeto Deluxe.
 

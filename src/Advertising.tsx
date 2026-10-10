@@ -55,7 +55,7 @@ export function BannerSlot({
     <>
       <img
         src={image}
-        alt={banner?.alt_text || banner?.title || "Publicidade Deluxe"}
+        alt={banner?.alt_text || banner?.title || "Publicidade JK HipHop"}
         loading="lazy"
         onError={() => setFailed(true)}
       />
