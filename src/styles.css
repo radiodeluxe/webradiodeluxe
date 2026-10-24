@@ -2718,3 +2718,81 @@ main section[id] {
 .promo-row:empty {
   display: none;
 }
+
+/* Public content and institutional pages share the radio's visual identity. */
+.program-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.program-card { height: 315px; }
+.program-card-content > strong { max-width: none; line-height: 1.02; }
+.program-description { font: 400 12px/1.55 Inter, sans-serif; color: #d5d5c9; margin-bottom: 15px; max-width: 30ch; }
+.radio-intro { display: grid; grid-template-columns: 0.85fr 1.2fr; gap: 45px; padding: 32px 0; border-bottom: 1px solid var(--border); }
+.radio-intro h2 { font: 700 clamp(26px, 3vw, 37px)/1.05 var(--heading); margin: 12px 0 0; max-width: 22ch; }
+.radio-intro p, .instagram-copy p { color: #b9b9ae; font-size: 12px; line-height: 1.8; margin: 0 0 12px; }
+.radio-intro .text-action { color: var(--yellow); font-size: 12px; }
+.instagram-callout { display: flex; align-items: center; gap: 26px; padding: 30px; margin: 35px 0; border: 1px solid #575031; border-radius: 5px; background: radial-gradient(ellipse at top right, #ffcf0015, transparent 65%), #13130f; }
+.instagram-emblem { display: grid; place-items: center; width: 66px; height: 66px; flex-shrink: 0; color: var(--yellow); border: 1px solid #ffcf0060; border-radius: 18px; transform: rotate(-5deg); }
+.instagram-copy { flex: 1; min-width: 0; }
+.instagram-copy h2 { font: 700 29px/1.1 var(--heading); margin: 9px 0 12px; }
+.instagram-copy h2 span { color: var(--yellow); white-space: nowrap; }
+.instagram-copy p { margin-bottom: 0; max-width: 70ch; }
+.instagram-callout > .yellow-button { white-space: nowrap; font-size: 11px; padding: 15px 18px; }
+.news-context { color: #b2b2a8; font-size: 12px; line-height: 1.8; margin: 0 0 22px; max-width: 90ch; }
+.news-context a { color: var(--yellow); text-decoration: underline; text-underline-offset: 3px; }
+.footer-bottom > a { font-size: 9px; color: #aaa99d; }
+.site-page-header { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding-block: 24px; border-bottom: 1px solid var(--border); }
+.site-page-header img { width: 180px; height: auto; }
+.site-page-header nav, .site-page-footer nav { display: flex; flex-wrap: wrap; gap: 16px 24px; }
+.site-page-header a, .site-page-footer a { font-size: 12px; }
+.site-page-header a:hover, .site-page-footer a:hover { color: var(--yellow); }
+.reading-page { max-width: 960px; padding-block: 56px 72px; min-height: 65vh; }
+.reading-page h1 { font: 800 clamp(38px, 6vw, 64px)/1.02 var(--heading); max-width: 24ch; margin: 12px 0 25px; text-transform: uppercase; }
+.reading-page h2 { font: 700 28px/1.15 var(--heading); margin: 30px 0 13px; }
+.reading-page h3 { font: 700 23px/1.2 var(--heading); }
+.reading-page p, .reading-page li { color: #c1c1b5; font-size: 15px; line-height: 1.9; max-width: 80ch; }
+.reading-page ul { padding-left: 22px; }
+.reading-page a:not(.yellow-button) { color: var(--yellow); text-decoration: underline; text-underline-offset: 4px; }
+.reading-page .yellow-button { margin: 15px 0; }
+.reading-page .eyebrow { color: var(--yellow); }
+.reading-page section { margin-top: 35px; }
+.site-page-footer { padding-block: 28px; border-top: 1px solid var(--border); color: #b0b0a5; }
+.site-page-footer p { font-size: 11px; line-height: 1.7; }
+@media (max-width: 900px) {
+  .program-card { height: 310px; min-width: 215px; flex-basis: 215px; }
+  .instagram-callout { flex-wrap: wrap; gap: 18px; }
+  .instagram-callout > .yellow-button { margin-left: 84px; }
+  .radio-intro { grid-template-columns: 1fr; gap: 20px; }
+  .site-page-header { flex-direction: column; align-items: flex-start; gap: 18px; }
+}
+@media (max-width: 540px) {
+  .program-card { height: 315px; min-width: 220px; flex-basis: 220px; }
+  .program-description { font-size: 11px; }
+  .instagram-callout { padding: 22px 18px; }
+  .instagram-emblem { width: 48px; height: 48px; border-radius: 13px; }
+  .instagram-copy { flex-basis: calc(100% - 70px); }
+  .instagram-copy h2 { font-size: 25px; }
+  .instagram-copy h2 span { white-space: normal; overflow-wrap: anywhere; }
+  .instagram-copy .eyebrow { font-size: 8px; letter-spacing: 1px; }
+  .instagram-callout > .yellow-button { margin-left: 0; width: 100%; justify-content: center; }
+  .site-page-header img { width: 150px; }
+  .site-page-header nav { gap: 12px 18px; }
+  .reading-page { padding-block: 32px 48px; }
+  .reading-page p, .reading-page li { font-size: 14px; }
+}
+
+.site-page-programs { display: grid; gap: 22px; margin-block: 30px; }
+.site-page-programs .site-page-program { display: grid; grid-template-columns: 200px 1fr; gap: 28px; align-items: center; margin: 0; padding: 18px; background: #141410; border: 1px solid var(--border); border-radius: 5px; }
+.site-page-program img { width: 100%; height: 180px; border-radius: 3px; }
+.site-page-program h2 { margin-top: 0; }
+.site-page-program p { margin: 0 0 9px; }
+.site-page-program-time { font-size: 12px !important; color: #a9a99c !important; }
+.site-page-note { padding: 24px; background: #ffcf0008; border-left: 2px solid var(--yellow); }
+.site-page-note h2 { margin-top: 0; }
+.site-page-footer img { width: 155px; height: auto; }
+.site-page-footer small { display: block; margin-top: 24px; font-size: 10px; color: #85857a; }
+.site-page-lead { font-size: 17px !important; color: #deded1 !important; }
+@media (max-width: 540px) {
+  .footer-main > .footer-links:last-child { grid-column: 1 / -1; grid-row: 3; }
+  .site-page-programs .site-page-program { grid-template-columns: 1fr; gap: 20px; padding: 16px; }
+  .site-page-program img { height: 180px; }
+  .site-page-lead { font-size: 15px !important; }
+  .site-page-note { padding: 18px; }
+}

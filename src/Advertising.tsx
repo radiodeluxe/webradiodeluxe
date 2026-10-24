@@ -68,7 +68,7 @@ export function BannerSlot({
       aria-label={banner?.title}
     >
       {target ? (
-        <a href={target} target="_blank" rel="noopener noreferrer">
+        <a href={target} target="_blank" rel="sponsored noopener noreferrer">
           {content}
         </a>
       ) : (

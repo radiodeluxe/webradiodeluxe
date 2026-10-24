@@ -348,6 +348,8 @@ export function NewsFeed({ open }: { open: (content: ModalContent) => void }) {
           <ArrowRight size={16} />
         </button>
       </div>
+      <p className="news-context">Notícias de música em português: chamadas de veículos externos, com crédito e acesso à publicação original.
+        As chamadas automáticas não são reportagens da JK HipHop. <a href="/editorial">Conheça nossa política editorial.</a></p>
       {loading ? (
         <LoadingState label="Buscando as últimas notícias…" />
       ) : error ? (

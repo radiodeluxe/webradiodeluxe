@@ -20,12 +20,12 @@ test("desktop renders assets and supports carousel, program details, search and 
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await page.getByRole("button", { name: "Buscar no site" }).click();
   await page.getByLabel("Busque programas e conteúdos").fill("classicos");
-  await expect(page.locator(".search-results button")).toHaveCount(2);
+  await expect(page.locator(".search-results button").filter({ hasText: "Clássicos do Rap" })).toHaveCount(1);
   await page
     .locator(".search-results button")
-    .filter({ hasText: "Clássicos do rap" })
+    .filter({ hasText: "Clássicos do Rap" })
     .click();
-  await expect(page.getByRole("dialog")).toContainText("Clássicos do rap");
+  await expect(page.getByRole("dialog")).toContainText("Clássicos do Rap");
   await page.keyboard.press("Escape");
   await page.locator("img").evaluateAll((images) =>
     images.forEach((img) => {
@@ -70,6 +70,10 @@ for (const width of [320, 390, 768]) {
 test("player without a stream clearly explains availability and does not simulate playback", async ({
   page,
 }) => {
+  await page.route("**/rest/v1/radio_settings?*", route => route.fulfill({
+    status: 200, contentType: "application/json",
+    body: JSON.stringify({ stream_url: null, instagram_url: null, youtube_url: null, contact_email: null }),
+  }));
   await page.goto("/");
   await page.getByRole("button", { name: "Ouvir rádio", exact: true }).click();
   await expect(page.getByRole("dialog")).toContainText(
@@ -97,55 +101,21 @@ test("playlist browsing opens a real search URL and explains the curation status
   );
 });
 
-test("newsletter requires consent, submits correct data and renders success without writing test data", async ({
-  page,
-}) => {
-  let payload: unknown;
-  await page.route("**/rest/v1/newsletter_subscribers", async (route) => {
-    payload = route.request().postDataJSON();
-    await route.fulfill({
-      status: 201,
-      contentType: "application/json",
-      body: "",
-    });
-  });
+test("programs and Instagram replace the removed email signup", async ({ page }) => {
   await page.goto("/");
-  await page
-    .getByLabel("Seu e-mail", { exact: true })
-    .fill("ouvinte@example.com");
-  await expect(
-    page.getByRole("button", { name: "Cadastrar e-mail" }),
-  ).toBeDisabled();
-  await page.locator(".consent input").check();
-  await page.getByRole("button", { name: "Cadastrar e-mail" }).click();
-  await expect(page.locator(".newsletter [role=status]")).toContainText(
-    "Você está na lista!",
-  );
-  expect(payload).toEqual({ email: "ouvinte@example.com", consent: true });
-});
-
-test("newsletter request failure provides a retryable error without a false success", async ({
-  page,
-}) => {
-  await page.route("**/rest/v1/newsletter_subscribers", (route) =>
-    route.fulfill({
-      status: 500,
-      contentType: "application/json",
-      body: JSON.stringify({ message: "temporary failure" }),
-    }),
-  );
-  await page.goto("/");
-  await page
-    .getByLabel("Seu e-mail", { exact: true })
-    .fill("ouvinte@example.com");
-  await page.locator(".consent input").check();
-  await page.getByRole("button", { name: "Cadastrar e-mail" }).click();
-  await expect(page.locator(".newsletter [role=status]")).toContainText(
-    "Não foi possível cadastrar",
-  );
-  await expect(
-    page.getByRole("button", { name: "Cadastrar e-mail" }),
-  ).toBeEnabled();
+  await expect(page.locator(".program-card")).toHaveCount(4);
+  await expect(page.locator(".program-card")).toContainText([
+    "Clássicos do Rap", "NoBreack Hip-Hop", "Pediu! Tocou", "Resenha Hip-Hop",
+  ]);
+  await expect(page.locator(".program-card").nth(1)).toContainText("sem intervalo");
+  await expect(page.getByText("NA FREQUÊNCIA DAS NOVIDADES")).toHaveCount(0);
+  await expect(page.locator('input[type="email"]')).toHaveCount(0);
+  const instagram = page.getByRole("link", { name: /SEGUIR NO INSTAGRAM/ });
+  await expect(instagram).toHaveAttribute("href", "https://www.instagram.com/radiojkhiphop/");
+  await expect(instagram).toHaveAttribute("rel", "noopener noreferrer");
+  await page.locator(".footer-main").getByRole("link", { name: "Política de privacidade" }).click();
+  await expect(page.locator("h1")).toContainText("Privacidade");
+  await expect(page.getByRole("link", { name: "Ouvir a rádio", exact: true })).toHaveAttribute("href", "/");
 });
 
 test("reduced motion disables animated transitions", async ({ page }) => {

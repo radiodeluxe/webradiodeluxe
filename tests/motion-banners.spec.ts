@@ -103,7 +103,7 @@ test("configured banner keeps its image and safe destination; disabled slot is h
   );
   await expect(banner.getByRole("link")).toHaveAttribute(
     "rel",
-    "noopener noreferrer",
+    "sponsored noopener noreferrer",
   );
   await expect(page.locator(".brand-banner")).toHaveCount(0);
   for (const width of [320, 390, 1440]) {

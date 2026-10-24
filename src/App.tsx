@@ -2,7 +2,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type FormEvent,
   type ReactNode,
 } from "react";
 import { useScrollReveal } from "./Motion";
@@ -10,7 +9,6 @@ import { BannerSlot, useAdBanners } from "./Advertising";
 import {
   ArrowDown,
   ArrowRight,
-  Check,
   ChevronLeft,
   ChevronRight,
   Diamond,
@@ -32,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { programs, playlists } from "./content";
+import { INSTAGRAM_URL } from "./seo";
 import { safeUrl, supabase, type RadioSettings } from "./lib";
 import { ListenerPoll, NewsFeed } from "./PublicFeatures";
 
@@ -246,117 +245,6 @@ function SearchContent({ open }: { open: (content: ModalContent) => void }) {
         )}
       </div>
     </>
-  );
-}
-
-function Newsletter({ openPrivacy }: { openPrivacy: () => void }) {
-  const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
-  const [company, setCompany] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    if (status === "loading" || !consent) return;
-    if (company) {
-      setStatus("success");
-      return;
-    }
-    if (!supabase) {
-      setStatus("error");
-      return;
-    }
-    setStatus("loading");
-    try {
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ email: email.trim().toLowerCase(), consent: true });
-      if (error && error.code !== "23505") throw error;
-      setStatus("success");
-      setEmail("");
-    } catch {
-      setStatus("error");
-    }
-  }
-  return (
-    <form onSubmit={submit} className="newsletter">
-      <h3>NA FREQUÊNCIA DAS NOVIDADES</h3>
-      <p>
-        Receba o que acontece na JK HipHop.
-        <br />
-        Sem ruído. Só o que importa.
-      </p>
-      <label className="sr-only" htmlFor="newsletter-email">
-        Seu e-mail
-      </label>
-      <div className="email-field">
-        <input
-          id="newsletter-email"
-          type="email"
-          maxLength={254}
-          placeholder="Seu melhor e-mail"
-          value={email}
-          required
-          disabled={status === "loading" || status === "success"}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (status === "error") setStatus("idle");
-          }}
-        />
-        <button
-          type="submit"
-          className="yellow-button"
-          disabled={!consent || status === "loading" || status === "success"}
-          aria-label="Cadastrar e-mail"
-        >
-          {status === "loading" ? (
-            <LoaderCircle className="spin" size={19} />
-          ) : status === "success" ? (
-            <Check size={19} />
-          ) : (
-            <ArrowRight size={21} />
-          )}
-        </button>
-      </div>
-      <label className="consent">
-        <input
-          type="checkbox"
-          required
-          checked={consent}
-          disabled={status === "success"}
-          onChange={(e) => setConsent(e.target.checked)}
-        />
-        <span>
-          Quero receber novidades por e-mail e li a{" "}
-          <button type="button" onClick={openPrivacy}>
-            política de privacidade
-          </button>
-          .
-        </span>
-      </label>
-      <div className="honeypot" aria-hidden="true">
-        <label htmlFor="company">Empresa</label>
-        <input
-          id="company"
-          name="company"
-          tabIndex={-1}
-          autoComplete="off"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-        />
-      </div>
-      <p
-        className={`form-message ${status === "error" ? "error" : ""}`}
-        role="status"
-      >
-        {status === "success"
-          ? "Você está na lista! Valeu por se conectar."
-          : status === "error"
-            ? "Não foi possível cadastrar agora. Tente novamente."
-            : ""}
-      </p>
-    </form>
   );
 }
 
@@ -654,66 +542,24 @@ export default function App() {
               <Mail size={18} /> Falar com a JK HipHop
             </a>
           ) : (
-            <p className="modal-highlight">
-              <Mail /> Nosso canal de contato será divulgado em breve.
-            </p>
+            <a className="yellow-button" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+              <Instagram size={18} /> Chame @radiojkhiphop no Instagram
+            </a>
           )}
         </>
       ),
     });
   }
-  function privacy() {
-    open({
-      title: "Sua privacidade tem espaço aqui.",
-      eyebrow: "POLÍTICA DE PRIVACIDADE",
-      body: (
-        <>
-          <p>
-            Ao se cadastrar, você autoriza a Web Rádio JK HipHop a guardar seu
-            e-mail e enviar novidades da rádio. O cadastro é opcional e depende
-            do seu consentimento.
-          </p>
-          <p>
-            Guardamos seu e-mail, a data de cadastro e a confirmação do
-            consentimento no Supabase. Esses dados não ficam disponíveis para
-            visitantes e não são vendidos. Não usamos cookies de publicidade ou
-            ferramentas de rastreamento nesta versão.
-          </p>
-          <p>
-            A enquete usa um identificador anônimo no navegador e um cookie
-            necessário para evitar votos repetidos. Guardamos o voto e um código
-            derivado do endereço de conexão para limitar abusos; o endereço IP
-            não é armazenado em texto aberto. Somente os totais das alternativas
-            ficam públicos.
-          </p>
-          <p>
-            O site usa fontes do Google e hospedagem da Vercel, que podem
-            processar dados técnicos da conexão. Ao abrir links para outras
-            plataformas, aplicam-se as políticas dessas plataformas.
-          </p>
-          <p>
-            O envio de campanhas ainda não está ativo. Antes de começar,
-            divulgaremos o canal para consultar, corrigir ou excluir seu
-            cadastro e incluiremos a opção de descadastro em cada mensagem.
-          </p>
-        </>
-      ),
-    });
-  }
-  function social(platform: "instagram" | "youtube") {
-    const url = safeUrl(
-      platform === "instagram"
-        ? settings?.instagram_url
-        : settings?.youtube_url,
-    );
+  function social(platform: "youtube") {
+    const url = safeUrl(platform === "youtube" ? settings?.youtube_url : null);
     if (url) window.open(url, "_blank", "noopener,noreferrer");
     else
       open({
         title: "O movimento também está nas redes.",
         body: (
           <p>
-            Os canais oficiais da JK HipHop serão divulgados em breve. Cadastre
-            seu e-mail no rodapé para acompanhar as novidades.
+            O canal da JK HipHop no YouTube será divulgado por aqui. Enquanto
+            isso, acompanhe a rádio no Instagram @radiojkhiphop.
           </p>
         ),
       });
@@ -885,13 +731,15 @@ export default function App() {
               <Search size={19} />
             </button>
             <span className="header-social">
-              <button
+              <a
                 className="icon-button"
-                aria-label="Instagram da JK HipHop"
-                onClick={() => social("instagram")}
+                aria-label="Instagram da JK HipHop: @radiojkhiphop"
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Instagram size={18} />
-              </button>
+              </a>
               <button
                 className="icon-button"
                 aria-label="YouTube da JK HipHop"
@@ -934,7 +782,7 @@ export default function App() {
                 {current.eyebrow}
               </span>
               <Brand large />
-              <h1>{current.title}</h1>
+              <h1><span className="sr-only">JK HipHop, web rádio de rap. </span>{current.title}</h1>
               <p>{current.copy}</p>
               <div className="hero-buttons">
                 <button className="yellow-button" onClick={listen}>
@@ -1054,7 +902,7 @@ export default function App() {
             {[
               {
                 icon: Headphones,
-                title: "RÁDIO 24H",
+                title: "WEB RÁDIO DE RAP",
                 copy: "O rap não tem hora",
               },
               {
@@ -1082,6 +930,20 @@ export default function App() {
               </div>
             ))}
           </section>
+          <section className="radio-intro" aria-labelledby="radio-intro-title">
+            <div>
+              <span className="eyebrow">JK HIPHOP · MÚSICA, CULTURA E RESPEITO</span>
+              <h2 id="radio-intro-title">Sua web rádio de rap e cultura hip hop</h2>
+            </div>
+            <div>
+              <p>O rap nacional conta histórias das nossas ruas. O rap internacional conecta
+                outras cenas à mesma batida. Na JK HipHop, os clássicos dos anos 90 e 2000
+                encontram novos sons, boom bap e conversas sobre o movimento.</p>
+              <p>Conheça os programas, participe da enquete e escolha o que quer ouvir.
+                Aqui, a música também abre espaço para a sua voz.</p>
+              <a className="text-action" href="/sobre">Conheça a JK HipHop <ArrowRight size={16} /></a>
+            </div>
+          </section>
           <section className="content-section" id="programacao">
             <div className="section-heading">
               <div>
@@ -1090,43 +952,9 @@ export default function App() {
                   NA NOSSA <span>PROGRAMAÇÃO</span>
                 </h2>
               </div>
-              <button
-                className="text-button"
-                onClick={() =>
-                  open({
-                    title: "Cada horário, uma nova conexão.",
-                    eyebrow: "GRADE DEMONSTRATIVA",
-                    body: (
-                      <>
-                        <p>
-                          Esta é a proposta inicial da programação da JK HipHop.
-                          Horários e programas serão confirmados antes da
-                          estreia.
-                        </p>
-                        <div className="schedule-list">
-                          {programs.map((item) => (
-                            <button
-                              key={item.title}
-                              onClick={() => program(item)}
-                            >
-                              <span>
-                                <b>{item.time}</b>
-                                <strong>{item.title}</strong>
-                              </span>
-                              <span>
-                                {item.days}
-                                <ArrowRight size={16} />
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    ),
-                  })
-                }
-              >
+              <a className="text-button" href="/programacao">
                 VER PROGRAMAÇÃO <ArrowRight size={16} />
-              </button>
+              </a>
             </div>
             <div className="program-grid">
               {programs.map((item, index) => (
@@ -1145,6 +973,7 @@ export default function App() {
                   <span className="program-card-content">
                     <span className="program-time">{item.time}</span>
                     <strong>{item.title}</strong>
+                    <span className="program-description">{item.description}</span>
                     <span className="tag">{item.days}</span>
                   </span>
                   <span className="card-arrow">
@@ -1244,6 +1073,18 @@ export default function App() {
               ))}
             </div>
           </section>
+          <section className="instagram-callout" aria-labelledby="instagram-heading">
+            <div className="instagram-emblem"><Instagram size={34} /></div>
+            <div className="instagram-copy">
+              <span className="eyebrow">A CONEXÃO CONTINUA FORA DO PLAY</span>
+              <h2 id="instagram-heading">Sua próxima troca de ideia começa no <span>@radiojkhiphop</span></h2>
+              <p>Curte rap? Chega junto. Siga a JK HipHop no Instagram, compartilhe seu som favorito
+                e mande aquele pedido que merece tocar na rádio. O movimento fica mais forte com você.</p>
+            </div>
+            <a className="yellow-button" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+              SEGUIR NO INSTAGRAM <ArrowUpRight />
+            </a>
+          </section>
           <ListenerPoll />
           <NewsFeed open={open} />
         </div>
@@ -1261,13 +1102,15 @@ export default function App() {
               pessoas, ideias e cultura.
             </p>
             <div className="footer-social">
-              <button
+              <a
                 className="icon-button"
-                aria-label="Instagram da JK HipHop"
-                onClick={() => social("instagram")}
+                aria-label="Instagram da JK HipHop: @radiojkhiphop"
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Instagram size={19} />
-              </button>
+              </a>
               <button
                 className="icon-button"
                 aria-label="YouTube da JK HipHop"
@@ -1291,8 +1134,9 @@ export default function App() {
                 {label}
               </a>
             ))}
-            <button onClick={about}>Sobre a rádio</button>
-            <button onClick={() => contact()}>Contato</button>
+            <a href="/sobre">Sobre a rádio</a>
+            <a href="/programacao">Programação completa</a>
+            <a href="/contato">Contato</a>
           </div>
           <div className="footer-links">
             <h3>A SUA FREQUÊNCIA</h3>
@@ -1303,14 +1147,20 @@ export default function App() {
             ))}
             <button onClick={() => contact(true)}>Anuncie aqui</button>
           </div>
-          <Newsletter openPrivacy={privacy} />
+          <div className="footer-links">
+            <h3>TRANSPARÊNCIA</h3>
+            <a href="/editorial">Política editorial</a>
+            <a href="/privacidade">Política de privacidade</a>
+            <a href="/termos">Termos de uso</a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Siga @radiojkhiphop</a>
+          </div>
         </div>
         <div className="container footer-bottom">
           <span>
             © {new Date().getFullYear()} Web Rádio JK HipHop. Todos os direitos
             reservados.
           </span>
-          <button onClick={privacy}>Privacidade</button>
+          <a href="/privacidade">Privacidade</a>
           <span className="footer-manifesto">
             RAP É CULTURA. <b>RAP É RESISTÊNCIA.</b>
           </span>

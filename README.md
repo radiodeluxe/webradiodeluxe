@@ -17,11 +17,12 @@ cp .env.example .env.local
 # POLL_WRITE_SECRET deve corresponder ao segredo da enquete no Vault.
 npm run dev
 npm run build
+npm run verify:seo
 npm run test:server
 npm test
 ```
 
-`BASE_URL` permite testar uma publicação. Os testes de navegador interceptam votos e inscrições; os testes SQL em `supabase/tests/` usam transações com rollback. `news-quota.sql` pressupõe três publicações já realizadas no dia e execução após 9h em Brasília. Nunca guardar credenciais em testes ou no Git.
+`BASE_URL` permite testar uma publicação. Os testes de navegador interceptam os envios de votos e tentativas de login; os testes SQL em `supabase/tests/` usam transações com rollback. `news-quota.sql` pressupõe três publicações já realizadas no dia e execução após 9h em Brasília. Nunca guardar credenciais em testes ou no Git.
 
 ## Funcionalidades
 
@@ -31,10 +32,10 @@ npm test
 - Gestão de banners no master: três espaços (aplicativo/topo, publicidade superior e principal), upload de JPG/PNG/WebP/GIF até 5 MB ou URL HTTPS, prévia, link, descrição acessível, ativação e restauração da chamada original. Mudanças aparecem ao abrir o site ou na próxima atualização de 60 segundos.
 - Notícias reais da Currents API em português, com categoria, autor/fonte, data e link original. Publicações manuais admitem conteúdo próprio e imagem HTTPS.
 - Enquete pública sem cadastro: opções, porcentagens, total de votos e confirmação de envio. Uma enquete ativa por vez.
-- Newsletter com consentimento e lista privada para o master.
+- Chamada para o Instagram oficial @radiojkhiphop e páginas públicas de Sobre, Programação, Contato, Privacidade, Termos e Política editorial. O formulário público de newsletter foi removido; os registros anteriores continuam privados no master.
 - Painel `/admin`: dashboard com dados reais, notícias/rascunhos/arquivamento, automação e histórico, gestão de enquetes, transmissão, contato/redes, newsletter e alteração da própria senha.
 
-A programação e as playlists permanecem como propostas demonstrativas da primeira etapa. O streaming ainda não foi informado e pode ser configurado em **Player / transmissão**. Aplicativos e equipe aguardam dados oficiais. O painel não apresenta estatísticas inventadas de audiência. Envio de campanhas não está implementado.
+A programação e as playlists permanecem como propostas demonstrativas da primeira etapa. O streaming é administrado em **Player / transmissão**; o site consulta a configuração ao abrir. Aplicativos e equipe aguardam dados oficiais. O painel não apresenta estatísticas inventadas de audiência. Envio de campanhas não está implementado.
 
 ## Autenticação e permissões
 
@@ -89,4 +90,16 @@ Ao trocar de projeto Supabase, atualizar variáveis, Vault e agendamentos. Não 
 
 ## Imagens e fontes
 
-Imagens conceituais próprias em `public/images/`, com proveniência em `ASSETS.md`. Não representam artistas ou eventos reais. Fotos externas só são usadas quando o master fornece uma URL própria. As fontes são Google Fonts. A política de privacidade no site descreve newsletter, enquete e provedores.
+Imagens conceituais próprias em `public/images/`, com proveniência em `ASSETS.md`. Não representam artistas ou eventos reais. Fotos externas só são usadas quando o master fornece uma URL própria. As fontes são Google Fonts. A política de privacidade em `/privacidade` descreve enquete, autenticação administrativa, registros de contatos anteriores e provedores.
+
+## SEO, GEO e transparência editorial
+
+O build produz HTML completo das sete páginas públicas, com um H1 por página, títulos e descrições específicos, canonical, Open Graph, Twitter e dados estruturados Organization/WebSite/WebPage. O navegador hidrata esse mesmo HTML. O conteúdo está disponível sem JavaScript; o player, a enquete e a atualização das notícias continuam interativos.
+
+`npm run verify:seo` verifica o HTML compilado, links canônicos, JSON-LD, arquivos de descoberta, conteúdo dos programas, painel sem indexação e ausência do formulário removido. `dist/robots.txt`, `dist/sitemap.xml` e `dist/llms.txt` são gerados a partir das páginas e programas compartilhados. Arquivos inexistentes usam o 404 nativo da Vercel, sem redirecionamento global para a home. O painel recebe documento próprio com noindex e X-Robots-Tag.
+
+O endereço canônico confirmado é `https://webradiodeluxe.vercel.app`. Em 24/10/2026, `radiojkhiphop.com` ainda não resolvia DNS nem constava nos domínios deste projeto Vercel. Quando o domínio estiver conectado e validado, atualizar `SITE_URL` em `src/seo.ts`, o CORS da função de notícias e fazer nova publicação. Não apontar canonical para um domínio sem site acessível.
+
+Palavras e assuntos são usados naturalmente em títulos, apresentações e descrições: rádio online de rap, rap nacional e internacional, hip-hop e clássicos dos anos 90 e 2000. `llms.txt` fornece contexto e links verificáveis para ferramentas de IA; não garante inclusão ou posição em respostas.
+
+Chamadas automáticas de notícias identificam origem e link, sem se apresentarem como reportagens próprias. Não há script AdSense ou vendedor fictício em ads.txt. Banners externos são rotulados e links comerciais recebem `rel="sponsored"`. A revisão de código e conteúdo não comprova aprovação do AdSense, indexação, licenças de execução musical ou regularidade de cada material enviado pelo administrador. Veja `docs/seo-adsense-audit.md` para os critérios e limites verificados.

@@ -3,9 +3,25 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/programacao/index.html", "destination": "/programacao", "permanent": true },
+    { "source": "/sobre/index.html", "destination": "/sobre", "permanent": true },
+    { "source": "/contato/index.html", "destination": "/contato", "permanent": true },
+    { "source": "/privacidade/index.html", "destination": "/privacidade", "permanent": true },
+    { "source": "/termos/index.html", "destination": "/termos", "permanent": true },
+    { "source": "/editorial/index.html", "destination": "/editorial", "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/admin", "destination": "/index.html" },
-    { "source": "/admin/:path*", "destination": "/index.html" }
+    { "source": "/programacao", "destination": "/programacao/index.html" },
+    { "source": "/sobre", "destination": "/sobre/index.html" },
+    { "source": "/contato", "destination": "/contato/index.html" },
+    { "source": "/privacidade", "destination": "/privacidade/index.html" },
+    { "source": "/termos", "destination": "/termos/index.html" },
+    { "source": "/editorial", "destination": "/editorial/index.html" },
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/:path*", "destination": "/admin/index.html" }
   ],
   "headers": [
     {
@@ -18,6 +34,18 @@
         },
         { "key": "X-Frame-Options", "value": "DENY" }
       ]
+    },
+    {
+      "source": "/admin/:path*",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/api/:path*",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/404.html",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }]
     }
   ]
 }
