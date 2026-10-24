@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import react from "@vitejs/plugin-react";
 import pollHandler from "./api/poll.js";
 import { publicPaths } from "./src/seo.ts";
@@ -12,6 +13,9 @@ export default defineConfig(({ mode }) => ({
       name: "preview-static-pages",
       configurePreviewServer(server) {
         const pages = new Set(publicPaths);
+        const renderer = import(pathToFileURL(resolve(server.config.root, "server/site-renderer.mjs")).href);
+        const template = readFile(resolve(server.config.root, ".prerender/template.html"), "utf8");
+        const publicEnv = { ...loadEnv(mode, server.config.root, "VITE_"), ...process.env };
         const aliases = new Map(publicPaths.map(path => [`${path === "/" ? "" : path}/index.html`, path]));
         server.middlewares.use(async (req, res, next) => {
           const url = new URL(req.url || "/", "http://localhost");
@@ -23,10 +27,18 @@ export default defineConfig(({ mode }) => ({
             res.end();
             return;
           }
-          if (pages.has(path)) {
-            // The alias redirect runs once, before this internal file rewrite.
-            req.url = `${path === "/" ? "" : path}/index.html${url.search}`;
-            next();
+          if (pages.has(path) || path === "/llms.txt") {
+            try {
+              const api = await renderer;
+              const [html, content] = await Promise.all([template, api.fetchPublicContent(publicEnv)]);
+              res.statusCode = 200;
+              res.setHeader("Cache-Control", "no-store");
+              res.setHeader("Content-Type", path === "/llms.txt" ? "text/plain; charset=utf-8" : "text/html; charset=utf-8");
+              res.end(path === "/llms.txt" ? api.renderLlms(content) : api.renderDocument(html, path, content));
+            } catch {
+              res.statusCode = 503;
+              res.end("Conteúdo temporariamente indisponível.");
+            }
             return;
           }
           if (/^\/admin(?:\/|$)/.test(path)) {

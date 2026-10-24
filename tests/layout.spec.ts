@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { defaultSiteContent } from "../src/site-content";
 
 test("desktop renders assets and supports carousel, program details, search and keyboard dismissal", async ({
   page,
@@ -15,7 +16,7 @@ test("desktop renders assets and supports carousel, program details, search and 
   await page.getByRole("button", { name: "Destaque anterior" }).click();
   await page.locator(".program-card").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("dialog")).toContainText("Grade demonstrativa");
+  await expect(page.getByRole("dialog")).toContainText("confirmar a disponibilidade da programação");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await page.getByRole("button", { name: "Buscar no site" }).click();
@@ -70,11 +71,12 @@ for (const width of [320, 390, 768]) {
 test("player without a stream clearly explains availability and does not simulate playback", async ({
   page,
 }) => {
-  await page.route("**/rest/v1/radio_settings?*", route => route.fulfill({
+  await page.route("**/rest/v1/rpc/public_site_content", route => route.fulfill({
     status: 200, contentType: "application/json",
-    body: JSON.stringify({ stream_url: null, instagram_url: null, youtube_url: null, contact_email: null }),
+    body: JSON.stringify(defaultSiteContent),
   }));
   await page.goto("/");
+  await expect(page.locator("audio")).not.toHaveAttribute("src", /https:\/\//);
   await page.getByRole("button", { name: "Ouvir rádio", exact: true }).click();
   await expect(page.getByRole("dialog")).toContainText(
     "TRANSMISSÃO EM CONFIGURAÇÃO",
@@ -85,20 +87,17 @@ test("player without a stream clearly explains availability and does not simulat
   ).toBeTruthy();
 });
 
-test("playlist browsing opens a real search URL and explains the curation status", async ({
+test("playlist without an official URL explains its curation status", async ({
   page,
 }) => {
   await page.goto("/");
   await page.locator(".playlist-card").first().click();
   await expect(page.getByRole("dialog")).toContainText(
-    "playlist oficial será publicada em breve",
+    "O link desta seleção ainda será divulgado pela rádio.",
   );
   await expect(
-    page.getByRole("link", { name: "Explorar no YouTube" }),
-  ).toHaveAttribute(
-    "href",
-    "https://www.youtube.com/results?search_query=rap%20nacional",
-  );
+    page.getByRole("dialog").getByRole("link", { name: "Abrir playlist" }),
+  ).toHaveCount(0);
 });
 
 test("programs and Instagram replace the removed email signup", async ({ page }) => {

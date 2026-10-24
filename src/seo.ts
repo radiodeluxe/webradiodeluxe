@@ -1,5 +1,6 @@
 export const SITE_URL = "https://webradiodeluxe.vercel.app";
 export const INSTAGRAM_URL = "https://www.instagram.com/radiojkhiphop/";
+import type { SiteContent } from "./site-content.tsx";
 
 export const publicPaths = [
   "/",
@@ -15,12 +16,12 @@ const pages: Record<string, { title: string; description: string }> = {
   "/": {
     title: "JK HipHop | Rádio online de rap nacional e internacional",
     description:
-      "Ouça a JK HipHop: rádio online de rap nacional e internacional. Conheça Clássicos do Rap, NoBreack Hip-Hop, Pediu! Tocou e Resenha Hip-Hop.",
+      "Ouça a JK HipHop: rádio online de rap nacional e internacional. Conheça a programação, explore playlists e participe da enquete dos ouvintes.",
   },
   "/programacao": {
     title: "Programação de rap e hip-hop | JK HipHop",
     description:
-      "Conheça os programas da JK HipHop: Clássicos do Rap, NoBreack Hip-Hop, Pediu! Tocou e Resenha Hip-Hop. Música, pedidos dos ouvintes e boa conversa.",
+      "Conheça a programação atual da JK HipHop: rap nacional e internacional, clássicos, pedidos dos ouvintes e boa conversa. Veja os programas e horários.",
   },
   "/sobre": {
     title: "Sobre a JK HipHop | Rap, música e cultura hip-hop",
@@ -30,7 +31,7 @@ const pages: Record<string, { title: string; description: string }> = {
   "/contato": {
     title: "Contato, pedidos de música e parcerias | JK HipHop",
     description:
-      "Fale com a JK HipHop pelo Instagram @radiojkhiphop. Envie pedidos de música, sugestões, propostas de parceria ou solicitações de correção de conteúdo.",
+      "Fale com a JK HipHop pelos canais oficiais. Envie pedidos de música, sugestões, propostas de parceria ou solicitações de correção de conteúdo.",
   },
   "/privacidade": {
     title: "Política de Privacidade | JK HipHop",
@@ -62,7 +63,7 @@ function normalizePath(path: string) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
 }
 
-export function getPageSeo(path: string): PageSeo {
+export function getPageSeo(path: string, content?: SiteContent): PageSeo {
   const pathname = normalizePath(path);
   const page = pages[pathname];
   if (!page) {
@@ -103,7 +104,9 @@ export function getPageSeo(path: string): PageSeo {
             width: 144,
             height: 144,
           },
-          sameAs: [INSTAGRAM_URL],
+          sameAs: content
+            ? [content.settings.instagram_url, content.settings.youtube_url, content.settings.facebook_url, content.settings.tiktok_url].filter((url) => typeof url === "string" && /^https:\/\//.test(url))
+            : [INSTAGRAM_URL],
         },
         {
           "@type": "WebSite",
@@ -123,6 +126,14 @@ export function getPageSeo(path: string): PageSeo {
           isPartOf: { "@id": websiteId },
           about: { "@id": organizationId },
         },
+        ...(pathname === "/programacao" && content ? [{
+          "@type": "ItemList",
+          name: "Programação JK HipHop",
+          itemListElement: content.items.filter(item => item.kind === "program").map((item, index) => ({
+            "@type": "ListItem", position: index + 1,
+            item: { "@type": "CreativeWork", name: item.title, description: item.description },
+          })),
+        }] : []),
       ],
     },
   };
@@ -141,8 +152,8 @@ function escapeHtml(value: string) {
   });
 }
 
-export function renderSeoHead(path: string) {
-  const seo = getPageSeo(path);
+export function renderSeoHead(path: string, content?: SiteContent) {
+  const seo = getPageSeo(path, content);
   const meta = (name: string, value: string, property = false) =>
     `<meta ${property ? "property" : "name"}="${escapeHtml(name)}" content="${escapeHtml(value)}" />`;
   const tags = [

@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const url = import.meta.env?.VITE_SUPABASE_URL;
+const key = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const supabase =
   url && key
     ? createClient(url, key, {
@@ -18,6 +18,10 @@ export type RadioSettings = {
   instagram_url: string | null;
   youtube_url: string | null;
   contact_email: string | null;
+  contact_text: string | null;
+  whatsapp_url: string | null;
+  facebook_url: string | null;
+  tiktok_url: string | null;
 };
 
 export function safeUrl(value: string | null | undefined): string | null {

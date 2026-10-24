@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { programs } from "./content";
-import { INSTAGRAM_URL } from "./seo";
+import { useSiteContent, instagramDetails } from "./site-content";
+import { safeUrl } from "./lib";
 
 const links = [
   ["/", "Ouvir a rádio"],
@@ -9,53 +9,65 @@ const links = [
   ["/contato", "Contato"],
 ] as const;
 
-function InstagramLink({
-  children = "Falar com @radiojkhiphop",
-}: {
-  children?: string;
-}) {
+function InstagramLink({ children }: { children?: string }) {
+  const { settings } = useSiteContent();
+  const instagram = instagramDetails(settings.instagram_url);
+  if (!instagram.url) return <a className="yellow-button" href="/contato">Canais de contato <span aria-hidden="true">↗</span></a>;
   return (
-    <a
-      className="yellow-button"
-      href={INSTAGRAM_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children} <span aria-hidden="true">↗</span>
+    <a className="yellow-button" href={instagram.url} target="_blank" rel="noopener noreferrer">
+      {children || `Falar com ${instagram.handle}`} <span aria-hidden="true">↗</span>
     </a>
   );
 }
 
+export function ContactChannels() {
+  const { settings } = useSiteContent();
+  const instagram = instagramDetails(settings.instagram_url);
+  const email = settings.contact_email?.trim();
+  const validEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+  const channels = [
+    { label: "WhatsApp", url: safeUrl(settings.whatsapp_url) },
+    { label: instagram.handle || "Instagram", url: instagram.url },
+    { label: "YouTube", url: safeUrl(settings.youtube_url) },
+    { label: "Facebook", url: safeUrl(settings.facebook_url) },
+    { label: "TikTok", url: safeUrl(settings.tiktok_url) },
+  ].filter((channel) => channel.url);
+  if (!validEmail && !channels.length) return <p className="muted-text">Os canais de contato serão divulgados pela rádio em breve.</p>;
+  return (
+    <div className="contact-channels">
+      {validEmail && <a className="yellow-button" href={`mailto:${encodeURIComponent(validEmail).replace("%40", "@")}`}>Enviar e-mail: {validEmail}</a>}
+      {channels.map((channel) => <a className="outline-button" href={channel.url!} key={channel.label} target="_blank" rel="noopener noreferrer">{channel.label} <span aria-hidden="true">↗</span></a>)}
+    </div>
+  );
+}
+
 function ProgramPage() {
+  const { items } = useSiteContent();
+  const programs = items.filter((item) => item.kind === "program");
   return (
     <>
       <span className="eyebrow">ENCONTRE A SUA BATIDA</span>
       <h1>Programação da JK HipHop</h1>
       <p className="site-page-lead">
         Das referências dos anos 90 e 2000 às músicas que você quer ouvir agora:
-        conheça os quatro programas que dão identidade à nossa seleção de rap
+        conheça os programas que dão identidade à nossa seleção de rap
         nacional e internacional.
       </p>
       <div className="site-page-programs">
         {programs.map((program) => (
-          <section className="site-page-program" key={program.title}>
-            <img
-              src={`/images/${program.image}.webp`}
-              alt=""
-              width="480"
-              height="320"
-              loading="lazy"
-            />
+          <section className={`site-page-program ${program.image_url ? "" : "without-image"}`} key={program.id}>
+            {program.image_url && <img src={program.image_url} alt="" width="480" height="320" loading="lazy" />}
             <div>
               <h2>{program.title}</h2>
               <p>{program.description}</p>
-              <p className="site-page-program-time">
-                <strong>Horário proposto:</strong> {program.time} ·{" "}
-                {program.days}
-              </p>
+              {(program.time_label || program.days_label) && <p className="site-page-program-time">
+                <strong>Horário proposto:</strong> {[program.time_label, program.days_label].filter(Boolean).join(" · ")}
+              </p>}
+              {safeUrl(program.link_url) && <a href={safeUrl(program.link_url)!} target="_blank" rel="noopener noreferrer">Conheça o programa ↗</a>}
             </div>
           </section>
         ))}
+        {!programs.length && <p>A programação está sendo atualizada. Volte em breve.</p>}
       </div>
       <section className="site-page-note">
         <h2>Como acompanhar os programas</h2>
@@ -78,8 +90,8 @@ function ProgramPage() {
       <section>
         <h2>O seu pedido também tem espaço</h2>
         <p>
-          Quer sugerir uma música para o Pediu! Tocou? Envie o nome da faixa e
-          do artista pelo Instagram. Conte por que esse som merece entrar na
+          Quer sugerir uma música? Envie o nome da faixa e
+          do artista pelos canais de contato da rádio. Conte por que esse som merece entrar na
           frequência. Os pedidos estão sujeitos à seleção e à disponibilidade da
           programação.
         </p>
@@ -109,10 +121,9 @@ function AboutPage() {
           construiu o movimento.
         </p>
         <p>
-          Clássicos do Rap, NoBreack Hip-Hop, Pediu! Tocou e Resenha Hip-Hop
-          representam formas diferentes de entrar nessa conversa: revisitar
-          referências, acompanhar uma sequência de músicas, sugerir um som ou
-          compartilhar uma boa resenha.
+          Os programas representam formas diferentes de entrar nessa conversa:
+          revisitar referências, acompanhar uma sequência de músicas, sugerir
+          um som ou compartilhar uma boa resenha.
         </p>
         <a href="/programacao">Conheça a proposta de cada programa</a>.
       </section>
@@ -135,7 +146,7 @@ function AboutPage() {
         <p>
           A sua sugestão pode trazer uma faixa, um tema de conversa ou uma nova
           perspectiva para a rádio. Participe da enquete na página inicial e
-          siga @radiojkhiphop no Instagram para conversar com a JK HipHop.
+          acompanhe os canais oficiais para conversar com a JK HipHop.
         </p>
         <InstagramLink children="Chegue junto no Instagram" />
       </section>
@@ -153,17 +164,17 @@ function AboutPage() {
 }
 
 function ContactPage() {
+  const { settings } = useSiteContent();
   return (
     <>
       <span className="eyebrow">A SUA VOZ FAZ PARTE</span>
       <h1>Fale com a JK HipHop</h1>
       <p className="site-page-lead">
-        Tem um pedido de música, uma ideia de pauta ou uma proposta de parceria?
-        Nosso canal público de contato é o Instagram @radiojkhiphop.
+        {settings.contact_text || "Tem um pedido de música, uma ideia de pauta ou uma proposta de parceria? Escolha um dos canais oficiais abaixo e fale com a JK HipHop."}
       </p>
-      <InstagramLink children="Enviar uma mensagem no Instagram" />
+      <ContactChannels />
       <section>
-        <h2>Pedidos para o Pediu! Tocou</h2>
+        <h2>Pedidos de músicas</h2>
         <p>
           Envie o nome da música e do artista. Se houver mais de uma versão,
           indique qual você gostaria de ouvir. Conte também o que esse som
@@ -299,7 +310,7 @@ function PrivacyPage() {
         <h2>Seus pedidos e atualizações desta política</h2>
         <p>
           Para perguntar sobre o tratamento de dados ou solicitar acesso,
-          correção ou exclusão, entre em contato com @radiojkhiphop. Pode ser
+          correção ou exclusão, utilize os <a href="/contato">canais de contato da rádio</a>. Pode ser
           necessário confirmar sua relação com os dados antes de atender a
           solicitação, para proteger outras pessoas. Os dados são mantidos
           conforme a necessidade de funcionamento, segurança e atendimento de
@@ -394,7 +405,7 @@ function TermsPage() {
         <p>
           Estes termos podem ser atualizados para acompanhar mudanças nos
           serviços. Dúvidas sobre o site, sua programação ou estas condições
-          podem ser encaminhadas ao Instagram @radiojkhiphop.
+          podem ser encaminhadas pelos <a href="/contato">canais de contato da rádio</a>.
         </p>
         <InstagramLink />
       </section>
@@ -456,7 +467,7 @@ function EditorialPage() {
         <h2>Correções e direitos de terceiros</h2>
         <p>
           Se uma chamada apresentar erro de título, atribuição, data ou link,
-          informe o problema pelo Instagram @radiojkhiphop. Envie o título ou o
+          informe o problema pelos <a href="/contato">canais de contato da rádio</a>. Envie o título ou o
           endereço da página e uma referência que ajude na verificação. A rádio
           poderá corrigir ou retirar a chamada após avaliar o caso.
         </p>
@@ -517,6 +528,8 @@ function NotFoundPage() {
 }
 
 export default function SitePage({ path }: { path: string }) {
+  const { settings } = useSiteContent();
+  const instagram = instagramDetails(settings.instagram_url);
   const pathname = (path.split(/[?#]/, 1)[0] || "/").replace(/\/+$/, "") || "/";
   const pageByPath: Record<string, ReactNode> = {
     "/programacao": <ProgramPage />,
@@ -576,9 +589,11 @@ export default function SitePage({ path }: { path: string }) {
           <a href="/privacidade">Privacidade</a>
           <a href="/termos">Termos de uso</a>
           <a href="/editorial">Política editorial</a>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-            @radiojkhiphop ↗
-          </a>
+          {instagram.url && <a href={instagram.url} target="_blank" rel="noopener noreferrer">{instagram.handle} ↗</a>}
+          {safeUrl(settings.youtube_url) && <a href={safeUrl(settings.youtube_url)!} target="_blank" rel="noopener noreferrer">YouTube ↗</a>}
+          {safeUrl(settings.facebook_url) && <a href={safeUrl(settings.facebook_url)!} target="_blank" rel="noopener noreferrer">Facebook ↗</a>}
+          {safeUrl(settings.tiktok_url) && <a href={safeUrl(settings.tiktok_url)!} target="_blank" rel="noopener noreferrer">TikTok ↗</a>}
+          {safeUrl(settings.whatsapp_url) && <a href={safeUrl(settings.whatsapp_url)!} target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>}
         </nav>
         <small>
           © JK HipHop. Respeite os direitos dos respectivos autores e

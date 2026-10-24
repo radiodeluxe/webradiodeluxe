@@ -29,8 +29,8 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
-import { programs, playlists } from "./content";
-import { INSTAGRAM_URL } from "./seo";
+import { useSiteContent, instagramDetails, type ContentItem } from "./site-content";
+import { ContactChannels } from "./SitePages";
 import { safeUrl, supabase, type RadioSettings } from "./lib";
 import { ListenerPoll, NewsFeed } from "./PublicFeatures";
 
@@ -146,6 +146,8 @@ export function Modal({
 }
 
 function SearchContent({ open }: { open: (content: ModalContent) => void }) {
+  const { items: contentItems } = useSiteContent();
+  const programs = contentItems.filter((item) => item.kind === "program");
   const [query, setQuery] = useState("");
   const [news, setNews] = useState<
     { title: string; body: string; source_url: string | null }[]
@@ -472,27 +474,18 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [slide, setSlide] = useState(0);
   const [modal, setModal] = useState<ModalContent | null>(null);
-  const [settings, setSettings] = useState<RadioSettings | null>(null);
+  const { items: contentItems, settings } = useSiteContent();
+  const programs = contentItems.filter((item) => item.kind === "program");
+  const playlists = contentItems.filter((item) => item.kind === "playlist");
+  const team = contentItems.filter((item) => item.kind === "team");
+  const gallery = contentItems.filter((item) => item.kind === "gallery");
+  const instagram = instagramDetails(settings.instagram_url);
+  const youtubeUrl = safeUrl(settings.youtube_url);
   const playlistTrack = useRef<HTMLDivElement>(null);
   const open = (content: ModalContent) => {
     setMenuOpen(false);
     setModal(content);
   };
-  useEffect(() => {
-    let active = true;
-    if (supabase)
-      void supabase
-        .from("radio_settings")
-        .select("stream_url, instagram_url, youtube_url, contact_email")
-        .eq("id", 1)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (active && data) setSettings(data);
-        });
-    return () => {
-      active = false;
-    };
-  }, []);
   function listen() {
     document.querySelector("#player")?.scrollIntoView({
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -534,89 +527,81 @@ export default function App() {
               ? "Conecte sua marca a quem vive a música e a cultura hip hop. Os espaços de publicidade da JK HipHop estão sendo preparados para parcerias que fazem sentido para o movimento."
               : "Artistas, produtores, ouvintes e parceiros: queremos construir essa conexão com você."}
           </p>
-          {settings?.contact_email ? (
-            <a
-              className="yellow-button"
-              href={`mailto:${settings.contact_email}`}
-            >
-              <Mail size={18} /> Falar com a JK HipHop
-            </a>
-          ) : (
-            <a className="yellow-button" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-              <Instagram size={18} /> Chame @radiojkhiphop no Instagram
-            </a>
-          )}
+          {settings.contact_text && <p>{settings.contact_text}</p>}
+          <ContactChannels />
         </>
       ),
     });
   }
-  function social(platform: "youtube") {
-    const url = safeUrl(platform === "youtube" ? settings?.youtube_url : null);
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
-    else
-      open({
-        title: "O movimento também está nas redes.",
-        body: (
-          <p>
-            O canal da JK HipHop no YouTube será divulgado por aqui. Enquanto
-            isso, acompanhe a rádio no Instagram @radiojkhiphop.
-          </p>
-        ),
-      });
-  }
-  function program(item: (typeof programs)[number]) {
+  function program(item: ContentItem) {
     open({
       title: item.title,
       eyebrow: "PROGRAMAÇÃO · PROPOSTA INICIAL",
       body: (
         <>
-          <img
-            className="modal-image"
-            src={`/images/${item.image}.webp`}
-            alt=""
-          />
+          {item.image_url && <img className="modal-image" src={item.image_url} alt="" />}
           <div className="program-meta">
-            <span>{item.time}</span>
-            <span className="tag">{item.days}</span>
+            {item.time_label && <span>{item.time_label}</span>}
+            {item.days_label && <span className="tag">{item.days_label}</span>}
           </div>
           <p>{item.description}</p>
-          <p className="muted-text">
-            Grade demonstrativa. Os horários e apresentadores serão confirmados
-            pela equipe antes da estreia.
-          </p>
+          {safeUrl(item.link_url) && <a className="yellow-button" href={safeUrl(item.link_url)!} target="_blank" rel="noopener noreferrer">Conheça o programa <ArrowRight size={16} /></a>}
+          <p className="muted-text">Consulte os avisos da rádio para confirmar a disponibilidade da programação.</p>
         </>
       ),
     });
   }
-  function playlist(item: (typeof playlists)[number]) {
+  function playlist(item: ContentItem) {
+    const url = safeUrl(item.link_url);
     open({
       title: item.title,
       eyebrow: "UNIVERSO JK HIPHOP",
       body: (
         <>
-          <img
-            className="modal-image"
-            src={`/images/${item.image}.webp`}
-            alt=""
-          />
-          <p>
-            {item.subtitle}. Esta categoria faz parte da curadoria que estamos
-            preparando para a JK HipHop.
-          </p>
-          <p>
-            A playlist oficial será publicada em breve. Enquanto isso, explore
-            esse estilo no YouTube.
-          </p>
-          <a
-            className="yellow-button"
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(item.query)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Youtube size={18} /> Explorar no YouTube <ArrowRight size={16} />
-          </a>
+          {item.image_url && <img className="modal-image" src={item.image_url} alt="" />}
+          <p>{item.description}</p>
+          {url ? (
+            <a className="yellow-button" href={url} target="_blank" rel="noopener noreferrer">
+              <Play size={18} /> Abrir playlist <ArrowRight size={16} />
+            </a>
+          ) : <p className="muted-text">O link desta seleção ainda será divulgado pela rádio.</p>}
         </>
       ),
+    });
+  }
+  function showTeam() {
+    open({
+      title: "As vozes por trás da frequência.",
+      eyebrow: "EQUIPE",
+      body: team.length ? (
+        <div className="public-team-grid">
+          {team.map((person) => (
+            <article className="public-team-card" key={person.id}>
+              {person.image_url && <img src={person.image_url} alt={person.title} loading="lazy" />}
+              <h3>{person.title}</h3>
+              {person.time_label && <span className="eyebrow">{person.time_label}</span>}
+              <p>{person.description}</p>
+              {safeUrl(person.link_url) && <a href={safeUrl(person.link_url)!} target="_blank" rel="noopener noreferrer">Conheça o trabalho <ArrowRight size={14} /></a>}
+            </article>
+          ))}
+        </div>
+      ) : <p>A rádio ainda não publicou os integrantes da equipe. Acompanhe as próximas novidades por aqui.</p>,
+    });
+  }
+  function showGallery() {
+    open({
+      title: "A cultura em cada frame.",
+      eyebrow: "GALERIA",
+      body: gallery.length ? (
+        <div className="gallery">
+          {gallery.map((item) => (
+            <figure key={item.id}>
+              {item.image_url && <img src={item.image_url} alt={item.title} loading="lazy" />}
+              <figcaption><strong>{item.title}</strong>{item.description && <p>{item.description}</p>}{safeUrl(item.link_url) && <a href={safeUrl(item.link_url)!} target="_blank" rel="noopener noreferrer">Saiba mais ↗</a>}</figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : <p>A rádio ainda não publicou imagens na galeria.</p>,
     });
   }
   const current = slides[slide];
@@ -648,72 +633,8 @@ export default function App() {
                 {label}
               </a>
             ))}
-            <button
-              onClick={() =>
-                open({
-                  title: "As vozes por trás da frequência.",
-                  eyebrow: "EQUIPE",
-                  body: (
-                    <>
-                      <p>
-                        Estamos reunindo a equipe que vai dar vida à JK HipHop.
-                        Em breve, você conhecerá nossos apresentadores, DJs e
-                        colaboradores.
-                      </p>
-                      <p>
-                        Gente que vive a cultura e acredita no poder da música.
-                      </p>
-                    </>
-                  ),
-                })
-              }
-            >
-              Equipe
-            </button>
-            <button
-              onClick={() =>
-                open({
-                  title: "A cultura em cada frame.",
-                  eyebrow: "GALERIA · IDENTIDADE VISUAL",
-                  body: (
-                    <>
-                      <p>
-                        Imagens conceituais criadas com IA para apresentar o
-                        universo visual da JK HipHop.
-                      </p>
-                      <div className="gallery">
-                        {[
-                          "rapper",
-                          "crowd",
-                          "city",
-                          "vinyl",
-                          "battle",
-                          "speakers",
-                        ].map((image, i) => (
-                          <img
-                            key={image}
-                            src={`/images/${image}.webp`}
-                            alt={
-                              [
-                                "Voz do rap",
-                                "Energia do palco",
-                                "Cultura urbana",
-                                "Raízes da batida",
-                                "Encontro de MCs",
-                                "Som de rua",
-                              ][i]
-                            }
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                    </>
-                  ),
-                })
-              }
-            >
-              Galeria
-            </button>
+            <button onClick={showTeam}>Equipe</button>
+            <button onClick={showGallery}>Galeria</button>
             <button onClick={() => contact()}>Contato</button>
           </nav>
           <div className="header-actions">
@@ -731,22 +652,16 @@ export default function App() {
               <Search size={19} />
             </button>
             <span className="header-social">
-              <a
+              {instagram.url && <a
                 className="icon-button"
-                aria-label="Instagram da JK HipHop: @radiojkhiphop"
-                href={INSTAGRAM_URL}
+                aria-label={`Instagram da JK HipHop: ${instagram.handle}`}
+                href={instagram.url!}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <Instagram size={18} />
-              </a>
-              <button
-                className="icon-button"
-                aria-label="YouTube da JK HipHop"
-                onClick={() => social("youtube")}
-              >
-                <Youtube size={19} />
-              </button>
+              </a>}
+              {youtubeUrl && <a className="icon-button" aria-label="YouTube da JK HipHop" href={youtubeUrl} target="_blank" rel="noopener noreferrer"><Youtube size={19} /></a>}
             </span>
             <button className="yellow-button header-listen" onClick={listen}>
               <Play size={15} fill="currentColor" /> OUVIR AGORA
@@ -960,27 +875,24 @@ export default function App() {
               {programs.map((item, index) => (
                 <button
                   className="program-card"
-                  key={item.title}
+                  key={item.id}
                   onClick={() => program(item)}
                 >
-                  <img
-                    src={`/images/${item.image}.webp`}
-                    alt=""
-                    loading="lazy"
-                  />
+                  {item.image_url && <img src={item.image_url} alt="" loading="lazy" />}
                   <span className="card-shade" />
-                  <span className="card-number">0{index + 1}</span>
+                  <span className="card-number">{String(index + 1).padStart(2, "0")}</span>
                   <span className="program-card-content">
-                    <span className="program-time">{item.time}</span>
+                    {item.time_label && <span className="program-time">{item.time_label}</span>}
                     <strong>{item.title}</strong>
                     <span className="program-description">{item.description}</span>
-                    <span className="tag">{item.days}</span>
+                    {item.days_label && <span className="tag">{item.days_label}</span>}
                   </span>
                   <span className="card-arrow">
                     <ArrowRight size={17} />
                   </span>
                 </button>
               ))}
+              {!programs.length && <p className="muted-text">A programação está sendo atualizada. Volte em breve.</p>}
             </div>
             <p className="demo-note">
               PROPOSTA DE PROGRAMAÇÃO · EM BREVE NA SUA FREQUÊNCIA
@@ -1051,15 +963,11 @@ export default function App() {
               {playlists.map((item) => (
                 <button
                   className="playlist-card"
-                  key={item.title}
+                  key={item.id}
                   onClick={() => playlist(item)}
                 >
                   <div className="playlist-image">
-                    <img
-                      src={`/images/${item.image}.webp`}
-                      alt=""
-                      loading="lazy"
-                    />
+                    {item.image_url && <img src={item.image_url} alt="" loading="lazy" />}
                     <span className="playlist-play">
                       <Play fill="currentColor" size={20} />
                     </span>
@@ -1068,23 +976,24 @@ export default function App() {
                     </span>
                   </div>
                   <strong>{item.title}</strong>
-                  <small>{item.subtitle}</small>
+                  <small>{item.description}</small>
                 </button>
               ))}
+              {!playlists.length && <p className="muted-text">As playlists estão sendo atualizadas. Volte em breve.</p>}
             </div>
           </section>
-          <section className="instagram-callout" aria-labelledby="instagram-heading">
+          {instagram.url && <section className="instagram-callout" aria-labelledby="instagram-heading">
             <div className="instagram-emblem"><Instagram size={34} /></div>
             <div className="instagram-copy">
               <span className="eyebrow">A CONEXÃO CONTINUA FORA DO PLAY</span>
-              <h2 id="instagram-heading">Sua próxima troca de ideia começa no <span>@radiojkhiphop</span></h2>
+              <h2 id="instagram-heading">Sua próxima troca de ideia começa no <span>{instagram.handle}</span></h2>
               <p>Curte rap? Chega junto. Siga a JK HipHop no Instagram, compartilhe seu som favorito
                 e mande aquele pedido que merece tocar na rádio. O movimento fica mais forte com você.</p>
             </div>
-            <a className="yellow-button" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+            <a className="yellow-button" href={instagram.url!} target="_blank" rel="noopener noreferrer">
               SEGUIR NO INSTAGRAM <ArrowUpRight />
             </a>
-          </section>
+          </section>}
           <ListenerPoll />
           <NewsFeed open={open} />
         </div>
@@ -1102,22 +1011,16 @@ export default function App() {
               pessoas, ideias e cultura.
             </p>
             <div className="footer-social">
-              <a
+              {instagram.url && <a
                 className="icon-button"
-                aria-label="Instagram da JK HipHop: @radiojkhiphop"
-                href={INSTAGRAM_URL}
+                aria-label={`Instagram da JK HipHop: ${instagram.handle}`}
+                href={instagram.url!}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <Instagram size={19} />
-              </a>
-              <button
-                className="icon-button"
-                aria-label="YouTube da JK HipHop"
-                onClick={() => social("youtube")}
-              >
-                <Youtube size={19} />
-              </button>
+              </a>}
+              {youtubeUrl && <a className="icon-button" aria-label="YouTube da JK HipHop" href={youtubeUrl} target="_blank" rel="noopener noreferrer"><Youtube size={19} /></a>}
               <button
                 className="icon-button"
                 aria-label="Contato da JK HipHop"
@@ -1125,6 +1028,9 @@ export default function App() {
               >
                 <Mail size={19} />
               </button>
+              {safeUrl(settings.facebook_url) && <a className="social-text-link" href={safeUrl(settings.facebook_url)!} target="_blank" rel="noopener noreferrer">Facebook ↗</a>}
+              {safeUrl(settings.tiktok_url) && <a className="social-text-link" href={safeUrl(settings.tiktok_url)!} target="_blank" rel="noopener noreferrer">TikTok ↗</a>}
+              {safeUrl(settings.whatsapp_url) && <a className="social-text-link" href={safeUrl(settings.whatsapp_url)!} target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>}
             </div>
           </div>
           <div className="footer-links">
@@ -1152,7 +1058,7 @@ export default function App() {
             <a href="/editorial">Política editorial</a>
             <a href="/privacidade">Política de privacidade</a>
             <a href="/termos">Termos de uso</a>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Siga @radiojkhiphop</a>
+            {instagram.url && <a href={instagram.url} target="_blank" rel="noopener noreferrer">Siga {instagram.handle}</a>}
           </div>
         </div>
         <div className="container footer-bottom">

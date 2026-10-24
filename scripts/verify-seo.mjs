@@ -20,7 +20,9 @@ const meta = (html, key) => {
 for (const path of publicPaths) {
   const file = path === "/" ? "index.html" : `${path.slice(1)}/index.html`;
   const html = await read(file);
-  const seo = getPageSeo(path);
+  const snapshot = JSON.parse(html.match(/<script id="site-content" type="application\/json">([\s\S]*?)<\/script>/)?.[1] || "null");
+  assert.ok(snapshot && Array.isArray(snapshot.items), `${path}: conteúdo público serializado`);
+  const seo = getPageSeo(path, snapshot);
   assert.match(html, /<html\b[^>]*lang="pt-BR"/i, `${path}: idioma`);
   assert.equal((html.match(/<title>/g) || []).length, 1, `${path}: título único`);
   assert.equal((html.match(/<meta\b[^>]*name="description"/g) || []).length, 1, `${path}: descrição única`);
@@ -38,7 +40,7 @@ for (const path of publicPaths) {
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1, `${path}: um h1 legível sem JavaScript`);
   assert.ok(!html.includes("<!--app-html"), `${path}: sem marcador pendente`);
   assert.ok(!html.includes("NA FREQUÊNCIA DAS NOVIDADES"), `${path}: newsletter removida`);
-  assert.ok(html.includes(INSTAGRAM_URL), `${path}: Instagram oficial`);
+  if (snapshot.settings.instagram_url) assert.ok(html.includes(snapshot.settings.instagram_url.replaceAll("&", "&amp;")), `${path}: Instagram configurado`);
 
   const schemas = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
   assert.ok(schemas.length > 0, `${path}: dados estruturados`);
@@ -52,7 +54,8 @@ for (const path of publicPaths) {
 
 for (const file of ["index.html", "programacao/index.html"]) {
   const html = await read(file);
-  for (const program of programs) {
+  const snapshot = JSON.parse(html.match(/<script id="site-content" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  for (const program of snapshot.items.filter(item => item.kind === "program")) {
     assert.ok(decoded(html).includes(program.title), `${file}: programa ${program.title}`);
     assert.ok(decoded(html).includes(program.description), `${file}: descrição ${program.title}`);
   }
@@ -78,13 +81,15 @@ assert.ok(robots.includes(`Sitemap: ${SITE_URL}/sitemap.xml`), "Sitemap canônic
 assert.ok(!/^Disallow: \/\s*$/m.test(robots), "Site público rastreável");
 const llms = await read("llms.txt");
 for (const path of publicPaths) assert.ok(llms.includes(new URL(path, SITE_URL).href), `llms.txt: ${path}`);
-for (const program of programs) assert.ok(llms.includes(program.title), `llms.txt: ${program.title}`);
+const home = await read("index.html");
+const snapshot = JSON.parse(home.match(/<script id="site-content" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+for (const program of snapshot.items.filter(item => item.kind === "program")) assert.ok(llms.includes(program.title), `llms.txt: ${program.title}`);
 
 const config = JSON.parse(await readFile(resolve("vercel.json"), "utf8"));
-assert.ok(config.rewrites.every((rewrite) => rewrite.source.startsWith("/admin") || publicPaths.includes(rewrite.source)), "Não há fallback global gerando falsos 200 em URLs inexistentes");
+assert.ok(config.rewrites.every((rewrite) => rewrite.source.startsWith("/admin") || publicPaths.includes(rewrite.source) || rewrite.source === "/llms.txt"), "Não há fallback global gerando falsos 200 em URLs inexistentes");
 assert.ok(config.rewrites.filter((rewrite) => rewrite.source.startsWith("/admin")).every((rewrite) => rewrite.destination === "/admin/index.html"), "Painel tem documento separado");
-for (const path of publicPaths.filter((path) => path !== "/")) {
-  assert.ok(config.rewrites.some((rewrite) => rewrite.source === path && rewrite.destination === `${path}/index.html`), `${path}: URL canônica entrega o HTML correspondente`);
+for (const path of publicPaths) {
+  assert.ok(config.rewrites.some((rewrite) => rewrite.source === path && rewrite.destination === `/api/render?page=${path}`), `${path}: URL canônica entrega conteúdo atual do painel em HTML`);
 }
 for (const area of ["/admin/:path*", "/api/:path*"]) {
   assert.ok(config.headers.some((entry) => entry.source === area && entry.headers.some((header) => header.key === "X-Robots-Tag" && header.value.includes("noindex"))), `${area}: cabeçalho noindex`);

@@ -3,6 +3,7 @@ import App from "./App";
 import SitePage from "./SitePages";
 import { LoadingState } from "./Motion";
 import { programs } from "./content";
+import { SiteContentProvider, defaultSiteContent, normalizeSiteContent, type SiteContent } from "./site-content";
 import {
   getPageSeo,
   INSTAGRAM_URL,
@@ -12,10 +13,11 @@ import {
 } from "./seo";
 
 export { getPageSeo, INSTAGRAM_URL, programs, publicPaths, SITE_URL };
+export { defaultSiteContent, normalizeSiteContent };
 
-// Render only local, owned content at build time. Supabase data remains live
-// on the client; no credentials or private/admin content enter static HTML.
-export function render(path: string) {
+// Render the same public snapshot into HTML and the hydration payload.
+// The invoker RPC and its RLS expose only published content.
+export function render(path: string, snapshot: SiteContent = defaultSiteContent) {
   const isAdmin = /^\/admin(?:\/|$)/.test(path);
   const content = isAdmin ? (
     <LoadingState fullscreen label="Carregando painel…" />
@@ -26,8 +28,8 @@ export function render(path: string) {
   );
 
   return {
-    html: renderToString(content),
-    head: renderSeoHead(path),
+    html: renderToString(isAdmin ? content : <SiteContentProvider initial={snapshot}>{content}</SiteContentProvider>),
+    head: renderSeoHead(path, snapshot),
     prerendered: !isAdmin,
   };
 }

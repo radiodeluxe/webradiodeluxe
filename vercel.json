@@ -4,6 +4,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "trailingSlash": false,
+  "functions": {
+    "api/render.js": {
+      "includeFiles": ".prerender/**"
+    }
+  },
   "redirects": [
     { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/programacao/index.html", "destination": "/programacao", "permanent": true },
@@ -14,12 +19,14 @@
     { "source": "/editorial/index.html", "destination": "/editorial", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/programacao", "destination": "/programacao/index.html" },
-    { "source": "/sobre", "destination": "/sobre/index.html" },
-    { "source": "/contato", "destination": "/contato/index.html" },
-    { "source": "/privacidade", "destination": "/privacidade/index.html" },
-    { "source": "/termos", "destination": "/termos/index.html" },
-    { "source": "/editorial", "destination": "/editorial/index.html" },
+    { "source": "/", "destination": "/api/render?page=/" },
+    { "source": "/programacao", "destination": "/api/render?page=/programacao" },
+    { "source": "/sobre", "destination": "/api/render?page=/sobre" },
+    { "source": "/contato", "destination": "/api/render?page=/contato" },
+    { "source": "/privacidade", "destination": "/api/render?page=/privacidade" },
+    { "source": "/termos", "destination": "/api/render?page=/termos" },
+    { "source": "/editorial", "destination": "/api/render?page=/editorial" },
+    { "source": "/llms.txt", "destination": "/api/render?page=/llms.txt" },
     { "source": "/admin", "destination": "/admin/index.html" },
     { "source": "/admin/:path*", "destination": "/admin/index.html" }
   ],

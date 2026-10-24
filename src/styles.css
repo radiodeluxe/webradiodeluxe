@@ -2796,3 +2796,22 @@ main section[id] {
   .site-page-lead { font-size: 15px !important; }
   .site-page-note { padding: 18px; }
 }
+
+/* Conteúdo publicado pelo administrador. */
+.contact-channels { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 22px; }
+.contact-channels a { max-width: 100%; overflow-wrap: anywhere; }
+.social-text-link { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.footer-social { flex-wrap: wrap; }
+.public-team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 24px; }
+.public-team-card { border: 1px solid var(--border); border-radius: 5px; padding: 18px; background: #141410; }
+.public-team-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; }
+.public-team-card h3 { font-size: 24px; margin-block: 14px 8px; }
+.public-team-card a { color: var(--yellow); }
+.gallery figure { margin: 0; min-width: 0; }
+.gallery figcaption { padding-block: 10px 16px; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.gallery figcaption strong { font-size: 15px; color: #f6f6f4; }
+.gallery figcaption p { margin-block: 5px; }
+.site-page-programs .site-page-program.without-image { grid-template-columns: 1fr; }
+
+.program-card-content > strong, .program-description, .playlist-card > small { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; }
+.public-team-card p { overflow-wrap: anywhere; }

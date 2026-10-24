@@ -10,6 +10,7 @@ import { LoadingState, useScrollReveal } from "./Motion";
 import {
   ArrowRight,
   BarChart3,
+  Camera,
   Check,
   ChevronRight,
   ExternalLink,
@@ -22,12 +23,14 @@ import {
   Mail,
   Menu,
   Newspaper,
+  Music2,
   Play,
   Plus,
   RefreshCw,
   Search,
   Settings,
   ShieldCheck,
+  Users,
   Vote,
   X,
 } from "lucide-react";
@@ -42,6 +45,7 @@ import type { RadioSettings } from "./lib";
 import "./admin.css";
 import BannerManager from "./AdminBanners";
 import type { Banner } from "./Advertising";
+import ContentManager from "./AdminContent";
 
 const client = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -61,13 +65,21 @@ type Section =
   | "news"
   | "polls"
   | "banners"
+  | "program"
+  | "playlist"
+  | "team"
+  | "gallery"
   | "radio"
   | "subscribers"
   | "settings";
 const modules = [
   { id: "dashboard", label: "Painel principal", icon: LayoutDashboard },
+  { id: "program", label: "Programas", icon: Headphones },
   { id: "news", label: "Notícias", icon: Newspaper },
+  { id: "playlist", label: "Playlists", icon: Music2 },
   { id: "polls", label: "Enquetes", icon: Vote },
+  { id: "team", label: "Equipe", icon: Users },
+  { id: "gallery", label: "Galeria", icon: Camera },
   { id: "banners", label: "Banners", icon: Image },
   { id: "radio", label: "Player / transmissão", icon: Headphones },
   { id: "subscribers", label: "Newsletter", icon: Mail },
@@ -325,7 +337,9 @@ function Panel({ email }: { email: string }) {
         .limit(50),
       client
         .from("radio_settings")
-        .select("stream_url,instagram_url,youtube_url,contact_email")
+        .select(
+          "stream_url,instagram_url,youtube_url,contact_email,contact_text,whatsapp_url,facebook_url,tiktok_url",
+        )
         .eq("id", 1)
         .single(),
       client
@@ -553,6 +567,17 @@ function Panel({ email }: { email: string }) {
           {loading && <LoadingState label="Atualizando painel…" />}
           {section === "banners" && (
             <BannerManager client={client} banners={banners} saved={saved} />
+          )}
+          {(section === "program" ||
+            section === "playlist" ||
+            section === "team" ||
+            section === "gallery") && (
+            <ContentManager
+              key={section}
+              client={client}
+              kind={section}
+              saved={saved}
+            />
           )}
           {error && (
             <p className="admin-message error" role="alert">
@@ -865,7 +890,7 @@ function Panel({ email }: { email: string }) {
               <p>{email}</p>
               <p>
                 O site oferece acesso administrativo exclusivo. Os ouvintes
-                participam da enquete e da newsletter sem criar uma conta.
+                participam das enquetes sem criar uma conta.
               </p>
               <PasswordForm />
             </section>
@@ -1326,8 +1351,20 @@ function SettingsEditor({
     const data = Object.fromEntries(
       (radio
         ? ["stream_url"]
-        : ["instagram_url", "youtube_url", "contact_email"]
-      ).map((key) => [key, values[key as keyof RadioSettings]?.trim() || null]),
+        : [
+            "instagram_url",
+            "youtube_url",
+            "contact_email",
+            "contact_text",
+            "whatsapp_url",
+            "facebook_url",
+            "tiktok_url",
+          ]
+      ).map((key) => [
+        key,
+        values[key as keyof RadioSettings]?.trim() ||
+          (key === "contact_text" ? "" : null),
+      ]),
     );
     const response = await client
       .from("radio_settings")
@@ -1369,6 +1406,7 @@ function SettingsEditor({
                 type="url"
                 pattern="https://.*"
                 placeholder="https://seu-servidor.com/stream"
+                disabled={busy}
                 value={values.stream_url || ""}
                 onChange={(e) =>
                   setValues({ ...values, stream_url: e.target.value })
@@ -1395,12 +1433,21 @@ function SettingsEditor({
                   type: "url",
                 },
                 { key: "youtube_url", label: "YouTube (HTTPS)", type: "url" },
+                {
+                  key: "whatsapp_url",
+                  label: "WhatsApp (HTTPS, ex.: https://wa.me/5511999999999)",
+                  type: "url",
+                },
+                { key: "facebook_url", label: "Facebook (HTTPS)", type: "url" },
+                { key: "tiktok_url", label: "TikTok (HTTPS)", type: "url" },
               ] as const
             ).map((field) => (
               <Field label={field.label} key={field.key}>
                 <input
                   type={field.type}
                   pattern={field.type === "url" ? "https://.*" : undefined}
+                  maxLength={field.type === "url" ? 4096 : 254}
+                  disabled={busy}
                   value={values[field.key] || ""}
                   onChange={(e) =>
                     setValues({ ...values, [field.key]: e.target.value })
@@ -1408,6 +1455,23 @@ function SettingsEditor({
                 />
               </Field>
             ))}
+            <Field label="Texto da página de contato">
+              <textarea
+                value={values.contact_text || ""}
+                maxLength={2000}
+                rows={5}
+                disabled={busy}
+                placeholder="Apresente os canais de contato e como falar com a rádio."
+                onChange={(event) =>
+                  setValues({ ...values, contact_text: event.target.value })
+                }
+              />
+            </Field>
+            <p className="admin-table-note">
+              Estas informações aparecem na página de contato e nos links do
+              site. Para remover um canal público, deixe o campo correspondente
+              vazio.
+            </p>
           </>
         )}
         <button className="yellow-button" disabled={busy}>

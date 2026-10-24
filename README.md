@@ -33,9 +33,11 @@ npm test
 - Notícias reais da Currents API em português, com categoria, autor/fonte, data e link original. Publicações manuais admitem conteúdo próprio e imagem HTTPS.
 - Enquete pública sem cadastro: opções, porcentagens, total de votos e confirmação de envio. Uma enquete ativa por vez.
 - Chamada para o Instagram oficial @radiojkhiphop e páginas públicas de Sobre, Programação, Contato, Privacidade, Termos e Política editorial. O formulário público de newsletter foi removido; os registros anteriores continuam privados no master.
-- Painel `/admin`: dashboard com dados reais, notícias/rascunhos/arquivamento, automação e histórico, gestão de enquetes, transmissão, contato/redes, newsletter e alteração da própria senha.
+- Painel `/admin`: dashboard com dados reais, notícias/rascunhos/arquivamento, automação e histórico, enquetes, programas, playlists, equipe, galeria, banners, transmissão, contato/redes, registros anteriores da newsletter e alteração da própria senha.
 
-A programação e as playlists permanecem como propostas demonstrativas da primeira etapa. O streaming é administrado em **Player / transmissão**; o site consulta a configuração ao abrir. Aplicativos e equipe aguardam dados oficiais. O painel não apresenta estatísticas inventadas de audiência. Envio de campanhas não está implementado.
+A programação, as playlists, a equipe e a galeria são administradas por completo no master: criar, editar, enviar imagem, alterar ordem, ativar/desativar e excluir. Em **Configurações**, o master edita o e-mail, o texto de contato e os links de Instagram, YouTube, Facebook, TikTok e WhatsApp. Um canal apagado deixa de aparecer. O streaming fica em **Player / transmissão**. Os horários iniciais ainda são propostas, e os links de playlists aguardam curadoria; a equipe começa vazia até o cadastro de integrantes reais. O painel não apresenta estatísticas inventadas de audiência.
+
+`site_content` guarda os quatro tipos de conteúdo com RLS: visitantes leem somente itens ativos; a escrita exige o master com sessão válida. `public_site_content()` é um RPC invoker que retorna somente itens ativos e campos públicos explicitamente selecionados. O bucket `deluxe-content` aceita JPG/PNG/WebP/GIF até 5 MB; envio, listagem e remoção exigem master. Os arquivos são públicos por URL mesmo quando o item é desativado. Fotos sem URL não recebem imagem substituta. Equipe e galeria não recebem pessoas ou eventos inventados.
 
 ## Autenticação e permissões
 
@@ -94,7 +96,7 @@ Imagens conceituais próprias em `public/images/`, com proveniência em `ASSETS.
 
 ## SEO, GEO e transparência editorial
 
-O build produz HTML completo das sete páginas públicas, com um H1 por página, títulos e descrições específicos, canonical, Open Graph, Twitter e dados estruturados Organization/WebSite/WebPage. O navegador hidrata esse mesmo HTML. O conteúdo está disponível sem JavaScript; o player, a enquete e a atualização das notícias continuam interativos.
+O build produz HTML completo das sete páginas públicas, com um H1 por página, títulos e descrições específicos, canonical, Open Graph, Twitter e dados estruturados Organization/WebSite/WebPage. Em produção, as rotas públicas e `llms.txt` passam por `api/render.js`, que consulta o RPC público usando somente a chave publishable. Assim, alterações no painel chegam ao HTML e aos dados estruturados dos buscadores sem novo deploy. O mesmo snapshot público é serializado com escape seguro e hidratado no navegador, que o atualiza a cada 30 segundos ou ao voltar à janela. Falha da consulta no servidor devolve 503 com Retry-After, sem repor conteúdo apagado a partir de valores antigos. `vite preview` usa o mesmo renderizador; o desenvolvimento usa o RPC no cliente.
 
 `npm run verify:seo` verifica o HTML compilado, links canônicos, JSON-LD, arquivos de descoberta, conteúdo dos programas, painel sem indexação e ausência do formulário removido. `dist/robots.txt`, `dist/sitemap.xml` e `dist/llms.txt` são gerados a partir das páginas e programas compartilhados. Arquivos inexistentes usam o 404 nativo da Vercel, sem redirecionamento global para a home. O painel recebe documento próprio com noindex e X-Robots-Tag.
 

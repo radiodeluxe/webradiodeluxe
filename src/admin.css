@@ -35,6 +35,12 @@
 .admin-sidebar nav {
   display: grid;
   gap: 7px;
+  align-content: start;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  flex: 1;
 }
 .admin-sidebar nav button {
   display: flex;
@@ -1127,6 +1133,101 @@
   accent-color: #ffcf00;
   width: 18px;
   height: 18px;
+}
+.admin-content-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.admin-content-item {
+  min-width: 0;
+  border: 1px solid #2a3938;
+  border-radius: 7px;
+  padding: 14px;
+}
+.admin-content-preview {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 1px solid #34403a;
+  border-radius: 5px;
+  background: #121916;
+}
+.admin-content-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-content-preview > span {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: #93a69f;
+  font-size: 11px;
+}
+.admin-content-item-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  gap: 10px;
+}
+.admin-content-item-heading small,
+.admin-content-meta {
+  font-size: 11px;
+  color: #93a69f;
+}
+.admin-content-item h3 {
+  font-size: 17px;
+  margin: 15px 0 8px;
+  overflow-wrap: anywhere;
+}
+.admin-content-description {
+  font-size: 12px;
+  color: #a9bbb3;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.admin-content-editor-preview {
+  max-width: 440px;
+}
+.admin-delete-button {
+  color: #f2a997;
+  margin-left: auto;
+}
+.admin-content-confirm {
+  border-top: 1px solid #604039;
+  margin-top: 17px;
+  padding-top: 14px;
+  color: #f4b3a3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.admin-content-confirm .admin-form-actions {
+  flex-wrap: wrap;
+}
+@media (max-width: 1200px) {
+  .admin-content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .admin-content-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .admin-field input[type="file"] {
   max-width: 100%;
