@@ -100,6 +100,8 @@ O build produz HTML completo das sete páginas públicas, com um H1 por página,
 
 `npm run verify:seo` verifica o HTML compilado, links canônicos, JSON-LD, arquivos de descoberta, conteúdo dos programas, painel sem indexação e ausência do formulário removido. `dist/robots.txt`, `dist/sitemap.xml` e `dist/llms.txt` são gerados a partir das páginas e programas compartilhados. Arquivos inexistentes usam o 404 nativo da Vercel, sem redirecionamento global para a home. O painel recebe documento próprio com noindex e X-Robots-Tag.
 
+Na Vercel, `npm run build:vercel` valida o HTML e remove do diretório estático somente os sete documentos públicos e `llms.txt`, pois arquivos existentes têm prioridade sobre rewrites. As URLs passam então pelo renderizador atual. O template e o bundle SSR continuam em `.prerender`, incluídos na função; imagens, assets, painel, 404, robots e sitemap permanecem estáticos.
+
 O endereço canônico confirmado é `https://webradiodeluxe.vercel.app`. Em 24/10/2026, `radiojkhiphop.com` ainda não resolvia DNS nem constava nos domínios deste projeto Vercel. Quando o domínio estiver conectado e validado, atualizar `SITE_URL` em `src/seo.ts`, o CORS da função de notícias e fazer nova publicação. Não apontar canonical para um domínio sem site acessível.
 
 Palavras e assuntos são usados naturalmente em títulos, apresentações e descrições: rádio online de rap, rap nacional e internacional, hip-hop e clássicos dos anos 90 e 2000. `llms.txt` fornece contexto e links verificáveis para ferramentas de IA; não garante inclusão ou posição em respostas.

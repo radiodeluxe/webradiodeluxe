@@ -86,6 +86,7 @@ const snapshot = JSON.parse(home.match(/<script id="site-content" type="applicat
 for (const program of snapshot.items.filter(item => item.kind === "program")) assert.ok(llms.includes(program.title), `llms.txt: ${program.title}`);
 
 const config = JSON.parse(await readFile(resolve("vercel.json"), "utf8"));
+assert.equal(config.buildCommand, "npm run build:vercel", "Publicação remove documentos estáticos que teriam prioridade sobre o HTML atual");
 assert.ok(config.rewrites.every((rewrite) => rewrite.source.startsWith("/admin") || publicPaths.includes(rewrite.source) || rewrite.source === "/llms.txt"), "Não há fallback global gerando falsos 200 em URLs inexistentes");
 assert.ok(config.rewrites.filter((rewrite) => rewrite.source.startsWith("/admin")).every((rewrite) => rewrite.destination === "/admin/index.html"), "Painel tem documento separado");
 for (const path of publicPaths) {
