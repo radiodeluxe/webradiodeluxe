@@ -1,0 +1,17 @@
+<resources>
+    <string name="preparing_player">Preparando player…</string>
+    <string name="live_status">● AO VIVO · Você está na frequência %1$s</string>
+    <string name="connecting_stream">Conectando à transmissão…</string>
+    <string name="stream_not_configured">TRANSMISSÃO EM CONFIGURAÇÃO</string>
+    <string name="tap_to_listen">Toque no play para ouvir a rádio</string>
+    <string name="saved_config_offline">Sem conexão · exibindo a última configuração salva</string>
+    <string name="config_connection_failed">Sem conexão com a rádio. Tente novamente em instantes.</string>
+    <string name="radio_footer">%1$s · RAP É CULTURA</string>
+    <string name="config_unavailable">Configuração temporariamente indisponível</string>
+    <string name="poll_unavailable">Enquete temporariamente indisponível. Confira sua conexão e tente novamente em instantes.</string>
+    <string name="choose_poll_option">Selecione uma opção para votar.</string>
+    <string name="registering_vote">Registrando seu voto…</string>
+    <string name="vote_confirmation_failed">Não foi possível confirmar o voto. Tente novamente.</string>
+    <string name="advertising">PUBLICIDADE</string>
+    <string name="advertising_position">PUBLICIDADE · %1$d/%2$d</string>
+</resources>

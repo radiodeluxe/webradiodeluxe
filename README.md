@@ -39,6 +39,21 @@ A programação, as playlists, a equipe e a galeria são administradas por compl
 
 `site_content` guarda os quatro tipos de conteúdo com RLS: visitantes leem somente itens ativos; a escrita exige o master com sessão válida. `public_site_content()` é um RPC invoker que retorna somente itens ativos e campos públicos explicitamente selecionados. O bucket `deluxe-content` aceita JPG/PNG/WebP/GIF até 5 MB; envio, listagem e remoção exigem master. Os arquivos são públicos por URL mesmo quando o item é desativado. Fotos sem URL não recebem imagem substituta. Equipe e galeria não recebem pessoas ou eventos inventados.
 
+## Aplicativo Android
+
+O módulo **Aplicativo** do master gerencia a identidade, o fundo, a visibilidade de enquete/contato e os banners exclusivos do Android. Transmissão, contato e redes são compartilhados com o site. Os anúncios superior e inferior têm ordem, ativação, imagem, descrição acessível e link próprios; a rotação ocorre a cada **15 segundos** em primeiro plano.
+
+Use banners de **1200 × 300 px (4:1)** ou **2400 × 600 px** para maior resolução, até 5 MB. O painel apresenta uma prévia em escala de **360 × 90 px** e avisa quando a proporção difere. As imagens aparecem inteiras, sem corte nem deformação. Não há anúncios fictícios quando nenhum banner está ativo.
+
+- Prévia web: https://webradiodeluxe.vercel.app/aplicativo
+- APK: https://webradiodeluxe.vercel.app/downloads/jk-hiphop.apk
+- Código e compilação: [android/README.md](android/README.md)
+- Banco, permissões e API: [docs/android-backend.md](docs/android-backend.md)
+
+O APK nativo exige Android 8.0 ou superior, não tem login de ouvintes e mantém a reprodução iniciada pelo usuário em segundo plano. Consulta a configuração pública ao abrir, ao retornar e a cada 60 segundos. A enquete usa a mesma proteção de votos do site. A prévia web não oferece as garantias de reprodução em segundo plano do APK.
+
+A rota de download redireciona para o arquivo público `JK-HipHop.apk` da release GitHub `android-v1.0.0`. A chave de assinatura e suas senhas ficam fora do repositório e devem ser preservadas para as próximas atualizações.
+
 ## Autenticação e permissões
 
 Conta master provisionada para o e-mail solicitado pelo proprietário. A senha não aparece no código, migrações ou variáveis do frontend. Não há formulário de cadastro ou contas públicas.
@@ -84,7 +99,7 @@ Dimensões recomendadas: 728 × 90 px nos dois espaços superiores e 1000 × 140
 
 ## Publicação
 
-Vercel: conta `admmovimentodf@gmail.com`, equipe `radiodeluxe`, projeto `webradiodeluxe`, produção `main`, build `npm run build`, saída `dist`. A integração GitHub dispara builds após o push. O domínio principal é público; previews/URLs de deploy mantêm proteção da Vercel.
+Vercel: conta `admmovimentodf@gmail.com`, equipe `radiodeluxe`, projeto `webradiodeluxe`, produção `main`, build `npm run build:vercel`, saída `dist`. A integração GitHub dispara builds após o push. O domínio principal é público; previews/URLs de deploy mantêm proteção da Vercel.
 
 Variáveis: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` e `POLL_WRITE_SECRET` nos ambientes development/preview/production. A chave Currents fica somente no Vault. `.env.local`, `.vercel`, `artifacts/`, sessões, dependências e relatórios de QA ficam fora do Git.
 

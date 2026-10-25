@@ -61,7 +61,7 @@ for (const file of ["index.html", "programacao/index.html"]) {
   }
 }
 
-for (const file of ["admin/index.html", "404.html"]) {
+for (const file of ["admin/index.html", "aplicativo/index.html", "404.html"]) {
   const html = await read(file);
   assert.match(meta(html, "robots") || "", /noindex/, `${file}: não indexar`);
   assert.ok(!html.includes('rel="canonical"'), `${file}: sem canonical de página pública`);
@@ -87,7 +87,7 @@ for (const program of snapshot.items.filter(item => item.kind === "program")) as
 
 const config = JSON.parse(await readFile(resolve("vercel.json"), "utf8"));
 assert.equal(config.buildCommand, "npm run build:vercel", "Publicação remove documentos estáticos que teriam prioridade sobre o HTML atual");
-assert.ok(config.rewrites.every((rewrite) => rewrite.source.startsWith("/admin") || publicPaths.includes(rewrite.source) || rewrite.source === "/llms.txt"), "Não há fallback global gerando falsos 200 em URLs inexistentes");
+assert.ok(config.rewrites.every((rewrite) => rewrite.source.startsWith("/admin") || publicPaths.includes(rewrite.source) || rewrite.source === "/llms.txt" || (rewrite.source === "/aplicativo" && rewrite.destination === "/aplicativo/index.html")), "Não há fallback global gerando falsos 200 em URLs inexistentes");
 assert.ok(config.rewrites.filter((rewrite) => rewrite.source.startsWith("/admin")).every((rewrite) => rewrite.destination === "/admin/index.html"), "Painel tem documento separado");
 for (const path of publicPaths) {
   assert.ok(config.rewrites.some((rewrite) => rewrite.source === path && rewrite.destination === `/api/render?page=${path}`), `${path}: URL canônica entrega conteúdo atual do painel em HTML`);
@@ -96,7 +96,7 @@ for (const area of ["/admin/:path*", "/api/:path*"]) {
   assert.ok(config.headers.some((entry) => entry.source === area && entry.headers.some((header) => header.key === "X-Robots-Tag" && header.value.includes("noindex"))), `${area}: cabeçalho noindex`);
 }
 
-const allHtml = [...publicPaths.map((path) => path === "/" ? "index.html" : `${path.slice(1)}/index.html`), "admin/index.html", "404.html"];
+const allHtml = [...publicPaths.map((path) => path === "/" ? "index.html" : `${path.slice(1)}/index.html`), "admin/index.html", "aplicativo/index.html", "404.html"];
 for (const file of allHtml) {
   const html = await read(file);
   const assets = [...html.matchAll(/<(?:script|link)\b[^>]*(?:src|href)="(\/assets\/[^"?#]+)[^"]*"/g)].map((match) => match[1]);

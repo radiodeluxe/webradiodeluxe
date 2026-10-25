@@ -761,18 +761,28 @@ export default function App() {
                 onClick={() =>
                   open({
                     title: "Leve a JK HipHop com você.",
-                    eyebrow: "APLICATIVO · EM BREVE",
+                    eyebrow: "APLICATIVO ANDROID",
                     body: (
                       <>
                         <p>
-                          O aplicativo da Web Rádio JK HipHop está nos nossos
-                          planos. Enquanto ele não chega, este site já se adapta
-                          ao seu celular.
+                          A sua frequência agora vai com você. Ouça a JK HipHop
+                          em segundo plano, acompanhe as redes e participe da
+                          enquete direto no aplicativo Android.
                         </p>
                         <p>
-                          Você pode adicionar o site à tela inicial pelo menu do
-                          seu navegador e acessar a JK HipHop com mais
-                          facilidade.
+                          Compatível com Android 8 ou superior. Baixe o APK e
+                          abra o arquivo no celular para instalar.
+                        </p>
+                        <p>
+                          <a
+                            className="yellow-button"
+                            href="/downloads/jk-hiphop.apk"
+                          >
+                            Baixar aplicativo Android <ArrowRight size={17} />
+                          </a>
+                        </p>
+                        <p>
+                          <a href="/aplicativo">Conhecer o aplicativo</a>
                         </p>
                       </>
                     ),
@@ -797,7 +807,7 @@ export default function App() {
                     LEVE A JK HIPHOP <em>COM VOCÊ.</em>
                   </strong>
                   <span className="app-note">
-                    O seu próximo app favorito. <b>EM BREVE</b>
+                    O rap em todo lugar. <b>BAIXAR ANDROID</b>
                   </span>
                 </span>
                 <ArrowRight className="app-arrow" size={23} />

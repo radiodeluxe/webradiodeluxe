@@ -1,0 +1,60 @@
+plugins { id 'com.android.application' }
+
+def signingFile = rootProject.file('signing.properties')
+def releaseKeys = new Properties()
+if (signingFile.exists()) signingFile.withInputStream { releaseKeys.load(it) }
+def productionApiUrl = 'https://webradiodeluxe.vercel.app/api/app'
+def debugApiUrl = providers.gradleProperty('appApiUrl').orElse(productionApiUrl).get()
+def debugApiUri = new URI(debugApiUrl)
+def localDebugApi = debugApiUri.scheme == 'http' && debugApiUri.host in ['localhost', '127.0.0.1', '10.0.2.2']
+if ((debugApiUri.scheme != 'https' && !localDebugApi) || !debugApiUri.host || debugApiUri.userInfo ||
+    debugApiUri.path != '/api/app' || debugApiUri.query || debugApiUri.fragment) {
+    throw new GradleException('appApiUrl must be an HTTPS /api/app URL or a local debug API URL.')
+}
+
+android {
+    namespace 'org.radiojkhiphop.app'
+    compileSdk 36
+    buildToolsVersion '36.1.0'
+    defaultConfig {
+        applicationId 'org.radiojkhiphop.app'
+        minSdk 26
+        targetSdk 36
+        versionCode 1
+        versionName '1.0.0'
+        buildConfigField 'String', 'API_URL', '"https://webradiodeluxe.vercel.app/api/app"'
+    }
+    buildFeatures { buildConfig true }
+    signingConfigs {
+        if (signingFile.exists()) {
+            release {
+                storeFile file(releaseKeys['storeFile'])
+                storePassword releaseKeys['storePassword']
+                keyAlias releaseKeys['keyAlias']
+                keyPassword releaseKeys['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            buildConfigField 'String', 'API_URL', groovy.json.JsonOutput.toJson(debugApiUrl)
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (signingFile.exists()) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.media3:media3-exoplayer:1.11.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.11.1'
+    implementation 'androidx.media3:media3-session:1.11.1'
+}

@@ -223,10 +223,35 @@ function PrivacyPage() {
       <span className="eyebrow">TRANSPARÊNCIA NO USO DOS DADOS</span>
       <h1>Política de Privacidade</h1>
       <p className="site-page-lead">
-        Esta política explica o tratamento de dados no site da JK HipHop. A
-        navegação e a reprodução da rádio são abertas; visitantes não precisam
-        criar uma conta.
+        Esta política explica o tratamento de dados no site e no aplicativo
+        Android da JK HipHop. A navegação e a reprodução da rádio são abertas;
+        visitantes não precisam criar uma conta.
       </p>
+      <section>
+        <h2>Aplicativo Android</h2>
+        <p>
+          O aplicativo guarda no próprio aparelho a última configuração pública
+          da rádio, a preferência de volume e o identificador necessário à
+          participação na enquete. As configurações e os banners são consultados
+          nos serviços da rádio; o áudio é solicitado ao servidor de streaming
+          quando você inicia a reprodução, inclusive em segundo plano.
+        </p>
+        <p>
+          A enquete utiliza o mesmo sistema de prevenção de duplicação descrito
+          abaixo. Não há cadastro de ouvintes nem acesso ao painel pelo app.
+          Você pode apagar os dados locais nas configurações do aplicativo no
+          Android. Isso remove as preferências do aparelho e pode alterar o
+          reconhecimento da participação na enquete; os totais já registrados no
+          servidor são preservados.
+        </p>
+        <p>
+          Imagens de publicidade podem ser carregadas dos endereços cadastrados
+          pela rádio, transmitindo ao provedor da imagem os dados técnicos dessa
+          requisição. Ao tocar em uma publicidade ou rede social, o link é
+          aberto em um aplicativo externo, sujeito à política do respectivo
+          serviço.
+        </p>
+      </section>
       <section>
         <h2>Navegação e transmissão</h2>
         <p>

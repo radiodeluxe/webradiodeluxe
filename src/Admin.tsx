@@ -30,6 +30,7 @@ import {
   Search,
   Settings,
   ShieldCheck,
+  Smartphone,
   Users,
   Vote,
   X,
@@ -41,11 +42,12 @@ import {
   type NewsPost,
   type Poll,
 } from "./PublicFeatures";
-import type { RadioSettings } from "./lib";
+import { safeUrl, type RadioSettings } from "./lib";
 import "./admin.css";
 import BannerManager from "./AdminBanners";
 import type { Banner } from "./Advertising";
 import ContentManager from "./AdminContent";
+import AppManager from "./AdminApp";
 
 const client = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -65,6 +67,7 @@ type Section =
   | "news"
   | "polls"
   | "banners"
+  | "app"
   | "program"
   | "playlist"
   | "team"
@@ -81,6 +84,7 @@ const modules = [
   { id: "team", label: "Equipe", icon: Users },
   { id: "gallery", label: "Galeria", icon: Camera },
   { id: "banners", label: "Banners", icon: Image },
+  { id: "app", label: "Aplicativo", icon: Smartphone },
   { id: "radio", label: "Player / transmissão", icon: Headphones },
   { id: "subscribers", label: "Newsletter", icon: Mail },
   { id: "settings", label: "Configurações", icon: Settings },
@@ -567,6 +571,26 @@ function Panel({ email }: { email: string }) {
           {loading && <LoadingState label="Atualizando painel…" />}
           {section === "banners" && (
             <BannerManager client={client} banners={banners} saved={saved} />
+          )}
+          {section === "app" && (
+            <>
+              <AppManager client={client} saved={saved} />
+              {settings && (
+                <>
+                  <p className="admin-table-note">
+                    A transmissão, as redes sociais e o contato abaixo são
+                    compartilhados entre o site e o aplicativo. Gerencie as
+                    perguntas e opções no módulo Enquetes.
+                  </p>
+                  <SettingsEditor settings={settings} radio saved={saved} />
+                  <SettingsEditor
+                    settings={settings}
+                    radio={false}
+                    saved={saved}
+                  />
+                </>
+              )}
+            </>
           )}
           {(section === "program" ||
             section === "playlist" ||
@@ -1343,10 +1367,16 @@ function SettingsEditor({
   const [values, setValues] = useState(settings),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
-  useEffect(() => setValues(settings), [settings]);
+  const dirty = useRef(false);
+  useEffect(() => {
+    if (!dirty.current) setValues(settings);
+  }, [settings]);
+  function change(values: RadioSettings) {
+    dirty.current = true;
+    setValues(values);
+  }
   async function submit(event: FormEvent) {
     event.preventDefault();
-    setBusy(true);
     setMessage("");
     const data = Object.fromEntries(
       (radio
@@ -1366,6 +1396,16 @@ function SettingsEditor({
           (key === "contact_text" ? "" : null),
       ]),
     );
+    for (const key of Object.keys(data)) {
+      if (!key.endsWith("_url") || !data[key]) continue;
+      const normalized = safeUrl(data[key]);
+      if (!normalized || /\s/.test(data[key]!)) {
+        setMessage("Use endereços HTTPS válidos nos campos de links.");
+        return;
+      }
+      data[key] = normalized;
+    }
+    setBusy(true);
     const response = await client
       .from("radio_settings")
       .update({ ...data, updated_at: new Date().toISOString() })
@@ -1375,6 +1415,7 @@ function SettingsEditor({
     setBusy(false);
     if (response.error) setMessage("Não foi possível salvar. Tente novamente.");
     else {
+      dirty.current = false;
       setMessage("Configuração salva.");
       saved();
     }
@@ -1399,7 +1440,7 @@ function SettingsEditor({
           <>
             <p>
               Insira o endereço direto do áudio da transmissão. O player aparece
-              fixo no topo do site.
+              fixo no topo do site e no centro do aplicativo.
             </p>
             <Field label="URL do streaming (HTTPS)">
               <input
@@ -1409,7 +1450,7 @@ function SettingsEditor({
                 disabled={busy}
                 value={values.stream_url || ""}
                 onChange={(e) =>
-                  setValues({ ...values, stream_url: e.target.value })
+                  change({ ...values, stream_url: e.target.value })
                 }
               />
             </Field>
@@ -1450,27 +1491,28 @@ function SettingsEditor({
                   disabled={busy}
                   value={values[field.key] || ""}
                   onChange={(e) =>
-                    setValues({ ...values, [field.key]: e.target.value })
+                    change({ ...values, [field.key]: e.target.value })
                   }
                 />
               </Field>
             ))}
             <Field label="Texto da página de contato">
               <textarea
+                aria-label="Texto da página de contato"
                 value={values.contact_text || ""}
                 maxLength={2000}
                 rows={5}
                 disabled={busy}
                 placeholder="Apresente os canais de contato e como falar com a rádio."
                 onChange={(event) =>
-                  setValues({ ...values, contact_text: event.target.value })
+                  change({ ...values, contact_text: event.target.value })
                 }
               />
             </Field>
             <p className="admin-table-note">
               Estas informações aparecem na página de contato e nos links do
-              site. Para remover um canal público, deixe o campo correspondente
-              vazio.
+              site e no aplicativo. Para remover um canal público, deixe o campo
+              correspondente vazio.
             </p>
           </>
         )}
