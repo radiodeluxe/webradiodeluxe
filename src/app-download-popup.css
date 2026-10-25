@@ -1,0 +1,52 @@
+.app-download-popup {
+  padding: 0;
+  width: min(590px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  color: #f6f6ef;
+  background: #0c0d0b;
+  border: 1px solid #8d7526;
+  border-radius: 18px;
+  box-shadow: 0 24px 100px #000b, 0 0 50px #ffcf0010;
+  overscroll-behavior: contain;
+}
+.app-download-popup::backdrop { background: #000b; backdrop-filter: blur(5px); }
+.app-download-popup[open] { animation: app-invitation-in 240ms ease-out both; }
+.app-download-card { position: relative; }
+.app-download-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: #10110fec;
+  color: white;
+  border: 1px solid #ffffff70;
+  border-radius: 50%;
+}
+.app-download-close:hover { background: #2b2c24; }
+.app-download-art { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #080908; }
+.app-download-copy { padding: 23px 30px 18px; text-align: center; }
+.app-download-eyebrow { display: flex; justify-content: center; align-items: center; gap: 7px; color: var(--yellow); font-size: 10px; font-weight: 700; letter-spacing: 1.3px; }
+.app-download-copy h2 { margin: 10px 0; font: 800 clamp(27px, 6vw, 35px)/1.1 var(--heading); text-transform: uppercase; }
+.app-download-copy p { max-width: 440px; margin: 0 auto 19px; color: #bcbfb4; font-size: 13px; line-height: 1.65; }
+.app-download-cta { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 12px; border-radius: 7px; color: #111208; background: var(--yellow); font-weight: 800; font-size: 15px; transition: background 160ms ease; }
+.app-download-cta:hover { background: #ffe564; }
+.app-download-requirements { display: block; margin-top: 10px; color: #a6aa9b; font-size: 10px; line-height: 1.6; }
+.app-download-later { min-height: 44px; margin-top: 3px; padding: 8px 16px; color: #e4e6dc; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+@keyframes app-invitation-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 540px) {
+  .app-download-popup { width: calc(100vw - 24px); max-height: calc(100dvh - 32px); border-radius: 13px; }
+  .app-download-copy { padding: 20px 20px 12px; }
+  .app-download-eyebrow { font-size: 9px; letter-spacing: 1px; }
+  .app-download-copy h2 { font-size: 28px; }
+  .app-download-copy p { font-size: 12px; margin-bottom: 15px; }
+  .app-download-cta { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-download-popup[open] { animation: none; }
+  .app-download-cta { transition: none; }
+}

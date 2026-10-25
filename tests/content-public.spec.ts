@@ -2,6 +2,10 @@ import { test, expect, type Page } from "@playwright/test";
 import { defaultSiteContent, type ContentItem, type SiteContent } from "../src/site-content";
 import { render } from "../src/entry-server";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("jk-app-download-popup-v1", "seen"));
+});
+
 function publishedContent(): SiteContent {
   const item = (kind: ContentItem["kind"], title: string, extra: Partial<ContentItem> = {}): ContentItem => ({
     id: `${kind}-edited`, kind, title, description: `Descrição publicada de ${title}.`,

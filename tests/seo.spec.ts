@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { publicPaths, getPageSeo } from "../src/seo";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("jk-app-download-popup-v1", "seen"));
+});
+
 test("public pages retain their own metadata and hydrate without errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));

@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("jk-app-download-popup-v1", "seen"));
+});
+
 for (const width of [320, 390, 768, 1440]) {
   test(`player stays at the top after scrolling at ${width}px`, async ({
     page,

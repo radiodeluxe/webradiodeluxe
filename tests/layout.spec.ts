@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { defaultSiteContent } from "../src/site-content";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("jk-app-download-popup-v1", "seen"));
+});
+
 test("desktop renders assets and supports carousel, program details, search and keyboard dismissal", async ({
   page,
 }) => {

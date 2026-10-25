@@ -4,6 +4,7 @@ import App from "./App";
 import SitePage from "./SitePages";
 import { publicPaths, renderSeoHead } from "./seo";
 import "./styles.css";
+import "./app-download-popup.css";
 import "./motion.css";
 import { LoadingState } from "./Motion";
 import { SiteContentProvider, defaultSiteContent, normalizeSiteContent } from "./site-content";

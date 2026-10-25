@@ -54,6 +54,8 @@ O APK nativo exige Android 8.0 ou superior, não tem login de ouvintes e mantém
 
 A rota de download redireciona para o arquivo público `JK-HipHop.apk` da release GitHub `android-v1.0.0`. A chave de assinatura e suas senhas ficam fora do repositório e devem ser preservadas para as próximas atualizações.
 
+A página inicial convida a baixar o app em um popup após 1,2 segundo. Ele aparece uma vez por sessão da aba, usando `sessionStorage` (`jk-app-download-popup-v1`), e aguarda o fechamento de outras janelas do site. O visitante pode fechar pelo X, por **Agora não**, pela tecla Escape ou pelo fundo. O diálogo mantém o foco no conteúdo, restaura foco e rolagem ao fechar e respeita movimento reduzido. A arte própria em WebP só é carregada quando a janela abre. O botão usa a rota de APK acima; o popup não aparece no painel, na prévia do aplicativo nem nas páginas institucionais.
+
 ## Autenticação e permissões
 
 Conta master provisionada para o e-mail solicitado pelo proprietário. A senha não aparece no código, migrações ou variáveis do frontend. Não há formulário de cadastro ou contas públicas.

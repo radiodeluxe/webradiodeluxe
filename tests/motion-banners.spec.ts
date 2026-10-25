@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("jk-app-download-popup-v1", "seen"));
+});
+
 test("scroll reveals below-fold sections with zoom and keeps them visible", async ({
   page,
 }) => {

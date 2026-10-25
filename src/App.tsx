@@ -33,6 +33,7 @@ import { useSiteContent, instagramDetails, type ContentItem } from "./site-conte
 import { ContactChannels } from "./SitePages";
 import { safeUrl, supabase, type RadioSettings } from "./lib";
 import { ListenerPoll, NewsFeed } from "./PublicFeatures";
+import AppDownloadPopup from "./AppDownloadPopup";
 
 export type ModalContent = { title: string; eyebrow?: string; body: ReactNode };
 const navigation = [
@@ -1083,6 +1084,7 @@ export default function App() {
         </div>
       </footer>
       <Modal content={modal} close={() => setModal(null)} />
+      <AppDownloadPopup />
     </>
   );
 }
