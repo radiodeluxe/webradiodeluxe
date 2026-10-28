@@ -135,10 +135,8 @@ function AppLogo({
 
 function RotatingBanner({
   banners,
-  slot,
 }: {
   banners: AppBanner[];
-  slot: AppBanner["slot"];
 }) {
   const [index, setIndex] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
@@ -146,12 +144,12 @@ function RotatingBanner({
     // A successful configuration refresh permits retrying transient image errors.
     setFailed((previous) => (previous.length ? [] : previous));
   }, [banners]);
+  // Both legacy placements belong to the same carousel in the current app.
   const items = banners.filter(
     (item) =>
-      item.slot === slot &&
       !failed.includes(item.image_url) &&
       safeHttps(item.image_url),
-  );
+  ).sort((a, b) => a.position - b.position);
   const signature = items.map((item) => item.id).join(":");
   useEffect(() => {
     setIndex(0);
@@ -183,7 +181,7 @@ function RotatingBanner({
   return (
     <section
       className="ra-ad"
-      aria-label={`Publicidade ${slot === "top" ? "superior" : "inferior"}`}
+      aria-label="Publicidade do aplicativo"
     >
       <span>
         PUBLICIDADE
@@ -553,35 +551,8 @@ export default function RadioApp() {
             Carregando a rádio…
           </p>
         )}
-        <RotatingBanner slot="top" banners={config?.banners || []} />
+        <RotatingBanner banners={config?.banners || []} />
         <section className="ra-player" aria-label="Player da rádio">
-          <div className={`ra-disc-stage ${playing ? "is-playing" : ""}`}>
-            <div className="ra-wave" aria-hidden="true">
-              {Array.from({ length: 25 }, (_, index) => (
-                <i
-                  key={index}
-                  style={{
-                    height: `${16 + ((index * 37) % 77)}%`,
-                    animationDelay: `${index * -0.09}s`,
-                  }}
-                />
-              ))}
-            </div>
-            <button
-              className="ra-disc"
-              onClick={toggle}
-              disabled={!stream}
-              aria-label={playing || buffering ? "Pausar rádio" : "Ouvir rádio"}
-            >
-              {buffering ? (
-                <LoaderCircle className="ra-spin" />
-              ) : playing ? (
-                <Pause fill="currentColor" />
-              ) : (
-                <Play fill="currentColor" />
-              )}
-            </button>
-          </div>
           <span
             className={`ra-stream-status ${playing ? "is-live" : ""}`}
             role="status"
@@ -615,10 +586,31 @@ export default function RadioApp() {
             />
             <Volume2 aria-hidden="true" />
           </label>
+          <div className="ra-controls">
+            {config?.settings.show_poll ? (
+              <button className="ra-control" onClick={() => setPanel("poll")}>
+                <Vote size={20} /> <span>Enquete</span>
+              </button>
+            ) : <span />}
+            <button
+              className="ra-play"
+              onClick={toggle}
+              disabled={!stream}
+              aria-label={playing || buffering ? "Pausar rádio" : "Ouvir rádio"}
+            >
+              {buffering ? <LoaderCircle className="ra-spin" /> : playing ? (
+                <Pause fill="currentColor" />
+              ) : <Play fill="currentColor" />}
+            </button>
+            {config?.settings.show_contact ? (
+              <button className="ra-control" onClick={() => setPanel("contact")}>
+                <MessageCircle size={20} /> <span>Contato</span>
+              </button>
+            ) : <span />}
+          </div>
         </section>
         {socials.length > 0 && (
           <section className="ra-socials" aria-label="Redes sociais da rádio">
-            <p>A BATIDA CONTINUA NAS REDES.</p>
             <div>
               {socials.map((item) => (
                 <a
@@ -635,7 +627,6 @@ export default function RadioApp() {
             </div>
           </section>
         )}
-        <RotatingBanner slot="bottom" banners={config?.banners || []} />
         <footer className="ra-footer">
           <span>RAP. CULTURA. RESPEITO.</span>
           <a href="/downloads/jk-hiphop.apk" download>

@@ -4,9 +4,9 @@ Aplicativo nativo Java, sem WebView e sem login de ouvintes. O conteúdo vem da 
 
 ## Interface e gestão
 
-- Player central em vinil preto e dourado, volume e estado real de reprodução.
-- Dois espaços de publicidade (superior e inferior), cada um com rotação a cada **15 segundos** enquanto o aplicativo está visível.
-- Banner recomendado: **1200 × 300 px, proporção 4:1**, JPG, PNG, WebP ou GIF até 5 MB. A imagem inteira é exibida com `FIT_CENTER`; outros formatos de proporção recebem espaço livre, sem corte ou deformação. O Android exibe a primeira imagem de GIFs, sem animação.
+- Publicidade quadrada na parte superior e player compacto preto e dourado na parte inferior, com volume e estado real de reprodução.
+- Um carrossel superior reúne todos os anúncios ativos, inclusive os cadastrados no antigo rodapé, ordenados por posição, com rotação a cada **15 segundos** enquanto o aplicativo está visível.
+- Banner recomendado: **1080 × 1080 px, proporção 1:1**, JPG, PNG, WebP ou GIF até 5 MB. A imagem inteira é exibida com `FIT_CENTER`; outros formatos de proporção recebem espaço livre, sem corte ou deformação. O Android exibe a primeira imagem de GIFs, sem animação.
 - Redes sociais só aparecem quando o respectivo endereço está cadastrado. Links e anúncios abrem no navegador do aparelho.
 - Menu com enquete compartilhada com o site, contato e privacidade. O master pode ocultar enquete e contato somente no app.
 - Nome, slogan, logo, fundo, banners, transmissão e canais de contato são configurados em **Admin → Aplicativo**.

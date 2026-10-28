@@ -67,14 +67,14 @@ const config = {
       image_url: "https://images.example/bottom.webp",
       target_url: null,
       slot: "bottom",
-      position: 0,
+      position: 2,
     },
   ],
   poll,
   poll_available: true,
 };
 
-test("app mobile rotates each slot at 15 seconds, preserves the full 4:1 artwork and shows only configured networks", async ({
+test("app combines legacy placements in a square carousel above the player, rotating every 15 seconds", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 900 });
@@ -87,23 +87,27 @@ test("app mobile rotates each slot at 15 seconds, preserves the full 4:1 artwork
   );
   await page.goto("/aplicativo");
   const top = page.getByRole("region", {
-    name: "Publicidade superior",
+    name: "Publicidade do aplicativo",
     exact: true,
   });
   await expect(top.getByAltText("Primeiro anúncio de teste")).toBeVisible();
   const box = await top.locator("a").boundingBox();
-  expect(box!.width / box!.height).toBeCloseTo(4, 0);
+  expect(box!.width / box!.height).toBeCloseTo(1, 2);
   await expect(top.locator("img")).toHaveCSS("object-fit", "contain");
   await expect(top.locator("a")).toHaveAttribute("rel", /sponsored/);
   await page.clock.fastForward(14999);
   await expect(top.getByAltText("Primeiro anúncio de teste")).toBeVisible();
   await page.clock.fastForward(1);
   await expect(top.getByAltText("Segundo anúncio de teste")).toBeVisible();
-  await expect(
-    page
-      .getByRole("region", { name: "Publicidade inferior" })
-      .getByAltText("Anúncio inferior de teste"),
-  ).toBeVisible();
+  await page.clock.fastForward(15000);
+  await expect(top.getByAltText("Anúncio inferior de teste")).toBeVisible();
+  await expect(page.getByRole("region", { name: /Publicidade/ })).toHaveCount(1);
+  const player = await page.getByRole("region", { name: "Player da rádio" }).boundingBox();
+  expect(player!.y).toBeGreaterThan(box!.y + box!.height);
+  const play = await page.getByRole("button", { name: "Ouvir rádio", exact: true }).boundingBox();
+  expect(play!.y + play!.height).toBeLessThan(900);
+  await page.clock.fastForward(15000);
+  await expect(top.getByAltText("Primeiro anúncio de teste")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Abrir Instagram da rádio" }),
   ).toHaveAttribute("href", /radiojkhiphop/);
@@ -152,7 +156,7 @@ test("app menu shares contact and anonymous poll, records a vote once and displa
   });
   await page.goto("/aplicativo");
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await page.getByRole("button", { name: "Contato", exact: true }).click();
+  await page.getByRole("navigation", { name: "Menu do aplicativo" }).getByRole("button", { name: "Contato", exact: true }).click();
   await expect(page.getByRole("dialog")).toContainText(
     "Envie seu pedido de música.",
   );
@@ -161,7 +165,7 @@ test("app menu shares contact and anonymous poll, records a vote once and displa
   ).toHaveAttribute("href", config.radio.whatsapp_url);
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await page.getByRole("button", { name: "Enquete", exact: true }).click();
+  await page.getByRole("navigation", { name: "Menu do aplicativo" }).getByRole("button", { name: "Enquete", exact: true }).click();
   await page.getByLabel("Rap nacional", { exact: true }).check();
   await page.getByRole("button", { name: "Confirmar voto" }).click();
   await expect(page.getByRole("dialog")).toContainText("Voto registrado.");

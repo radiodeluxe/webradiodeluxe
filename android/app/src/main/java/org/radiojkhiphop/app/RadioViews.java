@@ -9,11 +9,9 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
-import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.SweepGradient;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
@@ -56,68 +54,43 @@ final class RadioViews {
         @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
     }
 
-    static final class VinylView extends View {
+    static final class PlayButton extends View {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Shader glow = new RadialGradient(0, 0, 163,
-            new int[]{0x00000000, 0x00000000, 0x3AFFCE00, 0x00FFCE00}, new float[]{0, .8f, .91f, 1}, Shader.TileMode.CLAMP);
-        private final Shader record = new RadialGradient(-38, -60, 240,
-            new int[]{0xFF30312C, 0xFF111311, 0xFF050605}, null, Shader.TileMode.CLAMP);
-        private final Shader rim = new SweepGradient(0, 0,
-            new int[]{0xFF7C5C00, 0xFFFFD846, 0xFF7C5C00, 0xFFFFE67A, 0xFFFFCF00, 0xFF7C5C00}, null);
-        private final Shader shine = new SweepGradient(0, 0,
-            new int[]{0x00FFFFFF, 0x10FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x0AFFFFFF, 0x00FFFFFF}, null);
-        private final Shader playGold = new LinearGradient(-30, -38, 30, 38, 0xFFFFE580, 0xFFFFC400, Shader.TileMode.CLAMP);
-        private final Path playTriangle = new Path();
+        private final Shader gold = new LinearGradient(-30, -38, 30, 38,
+            0xFFFFE57A, 0xFFFFCF00, Shader.TileMode.CLAMP);
+        private final Path triangle = new Path();
+        private final RectF loadingArc = new RectF(-33, -33, 33, 33);
         private boolean playing, requested, active;
-        private final long created = SystemClock.uptimeMillis();
-        VinylView(Context context) {
+        PlayButton(Context context) {
             super(context); setClickable(true); setFocusable(true);
-            playTriangle.moveTo(-18, -32); playTriangle.cubicTo(-22, -34, -25, -32, -25, -27);
-            playTriangle.lineTo(-25, 27); playTriangle.cubicTo(-25, 32, -22, 34, -18, 32); playTriangle.lineTo(31, 4);
-            playTriangle.cubicTo(35, 2, 35, -2, 31, -4); playTriangle.close();
+            triangle.moveTo(-7, -12); triangle.lineTo(13, 0); triangle.lineTo(-7, 12); triangle.close();
         }
         void setPlayback(boolean playing, boolean requested) { this.playing = playing; this.requested = requested; invalidate(); }
         void setActive(boolean active) { this.active = active; invalidate(); }
-        @Override protected void onMeasure(int widthSpec, int heightSpec) {
-            int width = MeasureSpec.getSize(widthSpec);
-            int desired = Math.min(width, Math.round(360 * getResources().getDisplayMetrics().density));
-            setMeasuredDimension(width, desired);
-        }
+        @Override public CharSequence getAccessibilityClassName() { return "android.widget.Button"; }
         @Override protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            float scale = Math.min(getWidth(), getHeight()) / 360f;
-            float cx = getWidth() / 2f, cy = getHeight() / 2f;
-            canvas.save(); canvas.translate(cx, cy); canvas.scale(scale, scale);
-            float phase = playing && active && ValueAnimator.areAnimatorsEnabled() ? (SystemClock.uptimeMillis() - created) / 250f : 0;
-            paint.setShader(null); paint.setStyle(Paint.Style.FILL);
-            for (int i = -15; i <= 15; i++) {
-                float x = i * 12;
-                float amplitude = playing ? (float)(9 + 28 * Math.abs(Math.sin(i * 1.8 + phase))) : 6 + Math.abs(i % 4) * 3;
-                paint.setColor(Color.argb(Math.abs(i) > 11 ? 180 : 90, 255, 207, 0));
-                canvas.drawRoundRect(x - 2.7f, -amplitude, x + 2.7f, amplitude, 3, 3, paint);
-            }
-            paint.setShader(glow); canvas.drawCircle(0, 0, 163, paint);
-            paint.setShader(record);
-            canvas.drawCircle(0, 0, 143, paint);
-            paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(3.2f);
-            paint.setShader(rim);
-            canvas.drawCircle(0, 0, 144, paint);
-            paint.setShader(null); paint.setStrokeWidth(.7f);
-            for (int i = 0; i < 35; i++) { paint.setColor(i % 4 == 0 ? 0x383B3D37 : 0x28272A25); canvas.drawCircle(0, 0, 76 + i * 1.8f, paint); }
-            canvas.save(); canvas.rotate(phase * 2);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setShader(shine);
-            canvas.drawCircle(0, 0, 139, paint); canvas.restore();
-            paint.setShader(null); paint.setColor(0xFF050605); canvas.drawCircle(0, 0, 71, paint);
-            paint.setStyle(Paint.Style.STROKE); paint.setColor(MainActivity.GOLD); paint.setStrokeWidth(2.4f); canvas.drawCircle(0, 0, 70, paint);
-            paint.setStyle(Paint.Style.FILL); paint.setShader(playGold);
+            canvas.save(); canvas.translate(getWidth() / 2f, getHeight() / 2f);
+            float scale = Math.min(getWidth(), getHeight()) / 76f;
+            canvas.scale(scale, scale);
+            paint.setStyle(Paint.Style.FILL); paint.setShader(gold);
+            canvas.drawCircle(0, 0, 37, paint);
+            paint.setShader(null); paint.setColor(0xFF11130A);
             if (requested) {
-                canvas.drawRoundRect(-20, -27, -7, 27, 3, 3, paint); canvas.drawRoundRect(7, -27, 20, 27, 3, 3, paint);
-            } else {
-                canvas.drawPath(playTriangle, paint);
+                canvas.drawRoundRect(-9, -11, -3, 11, 1.5f, 1.5f, paint);
+                canvas.drawRoundRect(3, -11, 9, 11, 1.5f, 1.5f, paint);
+            } else canvas.drawPath(triangle, paint);
+            if (requested && !playing) {
+                paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(2); paint.setColor(0x8811130A);
+                float angle = ValueAnimator.areAnimatorsEnabled() ? SystemClock.uptimeMillis() % 1200 / 1200f * 360 : 0;
+                canvas.drawArc(loadingArc, angle, 90, false, paint);
             }
-            paint.setShader(null); canvas.restore();
-            if (playing && active && ValueAnimator.areAnimatorsEnabled()) postInvalidateDelayed(50);
+            if (isFocused()) {
+                paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(2); paint.setColor(Color.WHITE);
+                canvas.drawCircle(0, 0, 34, paint);
+            }
+            canvas.restore();
+            if (requested && !playing && active && ValueAnimator.areAnimatorsEnabled()) postInvalidateDelayed(50);
         }
         @Override public boolean performClick() { return super.performClick(); }
     }

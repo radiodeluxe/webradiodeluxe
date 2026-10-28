@@ -181,7 +181,7 @@ test("master manages app identity and shared channels without losing another for
   const state = await appMaster(page);
   await expect(
     page.getByText(
-      "Recomendado: 1200 × 300 px · Alta resolução: 2400 × 600 px",
+      "Recomendado: 1080 × 1080 px · Alta resolução: 2160 × 2160 px",
       { exact: true },
     ),
   ).toBeVisible();
@@ -278,7 +278,7 @@ test("master manages app identity and shared channels without losing another for
   expect(errors).toEqual([]);
 });
 
-test("master creates, orders, moves, disables and confirms deletion of app-only banners", async ({
+test("master creates, orders, disables and confirms deletion of app-only banners", async ({
   page,
 }) => {
   const state = await appMaster(page);
@@ -308,7 +308,7 @@ test("master creates, orders, moves, disables and confirms deletion of app-only 
       const rectangle = element.getBoundingClientRect();
       return rectangle.width / rectangle.height;
     });
-  expect(scale).toBeCloseTo(4, 1);
+  expect(scale).toBeCloseTo(1, 2);
   await page
     .getByLabel("Link do anúncio (HTTPS, opcional)")
     .fill("https://example.test/campanha");
@@ -334,9 +334,6 @@ test("master creates, orders, moves, disables and confirms deletion of app-only 
     })
     .click();
   await page
-    .getByLabel("Espaço no aplicativo", { exact: true })
-    .selectOption("bottom");
-  await page
     .getByLabel("Ordem de rotação (menor primeiro)", { exact: true })
     .fill("7");
   await page
@@ -348,7 +345,7 @@ test("master creates, orders, moves, disables and confirms deletion of app-only 
       exact: true,
     }),
   ).toBeVisible();
-  expect(state.banners[0]).toMatchObject({ slot: "bottom", position: 7 });
+  expect(state.banners[0]).toMatchObject({ slot: "top", position: 7 });
   await page
     .getByRole("button", {
       name: "Desativar anúncio Publicidade exclusiva do app",
@@ -424,7 +421,7 @@ test("failed uploads do not persist app ads and failed saves clean newly uploade
     .setInputFiles(png);
   await expect(
     page.getByText("Imagem enviada: 1 × 1 px.", { exact: false }),
-  ).toContainText("sem cortes nem deformação");
+  ).toHaveText("Imagem enviada: 1 × 1 px.");
   state.failUpload = true;
   await page
     .getByRole("button", { name: "Salvar anúncio do app", exact: true })

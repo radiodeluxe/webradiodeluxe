@@ -171,15 +171,15 @@ function ImageField({
       {banner && (
         <p className="admin-app-image-guidance">
           <strong>
-            Banner do app: proporção 4:1. Recomendado: 1200 × 300 px.
+            Banner do app: proporção 1:1. Recomendado: 1080 × 1080 px.
           </strong>{" "}
-          Para alta resolução, use 2400 × 600 px. Exemplo no celular: 360 × 90
+          Para alta resolução, use 2160 × 2160 px. Exemplo no celular: 360 × 360
           px. JPG, PNG, WebP ou GIF de até 5 MB.
           {dimensions && (
             <span>
               Imagem enviada: {dimensions.width} × {dimensions.height} px.
-              {Math.abs(dimensions.width / dimensions.height - 4) > 0.08 &&
-                " A proporção é diferente de 4:1; a imagem será ajustada sem cortes nem deformação e poderá deixar faixas nas bordas."}
+              {Math.abs(dimensions.width / dimensions.height - 1) > 0.08 &&
+                " A proporção é diferente de 1:1; a imagem será ajustada sem cortes nem deformação e poderá deixar faixas nas bordas."}
             </span>
           )}
         </p>
@@ -297,8 +297,8 @@ export default function AppManager({
           </a>
         </div>
         <p>
-          Identidade visual, player central e dois espaços de publicidade. Os
-          anúncios ativos de cada posição se alternam a cada{" "}
+          Identidade visual, publicidade quadrada no topo e player na parte inferior. Os
+          anúncios ativos no topo se alternam a cada{" "}
           <strong>15 segundos</strong>.
         </p>
         <p className="admin-table-note">
@@ -365,20 +365,20 @@ export default function AppManager({
               </button>
             </div>
             <p className="admin-table-note">
-              Cadastre vários anúncios no topo ou no rodapé. A menor posição
+              Cadastre anúncios quadrados no topo do app. A menor posição
               aparece primeiro; a troca ocorre a cada 15 segundos.
             </p>
             <div className="admin-app-banner-spec">
-              <strong>Topo e rodapé: banners na proporção 4:1</strong>
+              <strong>Topo do app: banners quadrados na proporção 1:1</strong>
               <span>
-                Recomendado: 1200 × 300 px · Alta resolução: 2400 × 600 px
+                Recomendado: 1080 × 1080 px · Alta resolução: 2160 × 2160 px
               </span>
               <span>
-                Exibição de exemplo no celular: 360 × 90 px · JPG, PNG, WebP ou
+                Exibição de exemplo no celular: 360 × 360 px · JPG, PNG, WebP ou
                 GIF · Até 5 MB
               </span>
               <small>
-                Prévia em escala 4:1. As imagens são exibidas inteiras, sem
+                Prévia em escala 1:1. As imagens são exibidas inteiras, sem
                 cortes nem deformação.
               </small>
             </div>
@@ -409,7 +409,7 @@ export default function AppManager({
                       {banner.enabled ? "Ativo" : "Desativado"}
                     </span>
                     <small>
-                      {banner.slot === "top" ? "Topo" : "Rodapé"} · Posição{" "}
+                      Topo · Posição{" "}
                       {banner.position}
                     </small>
                   </div>
@@ -643,7 +643,7 @@ function AppSettingsEditor({
           </label>
         </div>
         <p className="admin-table-note">
-          Rotação da publicidade: 15 segundos por anúncio em cada espaço.
+          Rotação da publicidade: 15 segundos por anúncio, no carrossel superior.
         </p>
         <button className="yellow-button" disabled={busy}>
           {busy ? "Salvando…" : "Salvar aplicativo"}
@@ -681,7 +681,8 @@ function AppBannerEditor({
   const [alt, setAlt] = useState(item?.alt_text || "");
   const [image, setImage] = useState(item?.image_url || "");
   const [link, setLink] = useState(item?.target_url || "");
-  const [slot, setSlot] = useState<"top" | "bottom">(item?.slot || "top");
+  // Keep existing placements compatible with installations of app 1.0.
+  const slot = item?.slot || "top";
   const [position, setPosition] = useState(item?.position ?? nextPosition);
   const [enabled, setEnabled] = useState(item?.enabled ?? false);
   const [file, setFile] = useState<File | null>(null);
@@ -812,20 +813,6 @@ function AppBannerEditor({
         </label>
         <div className="admin-form-row">
           <label className="admin-field">
-            <span>Espaço no aplicativo</span>
-            <select
-              aria-label="Espaço no aplicativo"
-              value={slot}
-              onChange={(event) =>
-                setSlot(event.target.value as "top" | "bottom")
-              }
-              disabled={busy}
-            >
-              <option value="top">Topo — acima do player</option>
-              <option value="bottom">Rodapé — abaixo das redes sociais</option>
-            </select>
-          </label>
-          <label className="admin-field">
             <span>Ordem de rotação (menor primeiro)</span>
             <input
               type="number"
@@ -849,7 +836,7 @@ function AppBannerEditor({
           Anúncio ativo no aplicativo
         </label>
         <p className="admin-table-note">
-          Os anúncios ativos deste espaço se alternam a cada 15 segundos. Salve
+          Os anúncios ativos no topo se alternam a cada 15 segundos. Salve
           desativado para preparar um rascunho.
         </p>
         <div className="admin-form-actions">

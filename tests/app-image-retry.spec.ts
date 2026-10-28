@@ -68,7 +68,7 @@ test("app retries the same logo and banner URLs after a successful 60-second con
   await page.goto("/aplicativo");
   const logo = page.getByRole("img", { name: "JK HipHop", exact: true });
   const top = page.getByRole("region", {
-    name: "Publicidade superior",
+    name: "Publicidade do aplicativo",
     exact: true,
   });
   await expect.poll(() => attempts.get(logoUrl)).toBe(1);
@@ -127,7 +127,7 @@ test("a normal configuration refresh keeps the existing 15-second banner rotatio
 
   await page.goto("/aplicativo");
   const top = page.getByRole("region", {
-    name: "Publicidade superior",
+    name: "Publicidade do aplicativo",
     exact: true,
   });
   await expect(top.getByAltText("Primeiro anúncio de teste")).toBeVisible();

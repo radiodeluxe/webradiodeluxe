@@ -10,7 +10,7 @@
     }
   },
   "redirects": [
-    { "source": "/downloads/jk-hiphop.apk", "destination": "https://github.com/radiodeluxe/webradiodeluxe/releases/download/android-v1.0.0/JK-HipHop.apk", "permanent": false },
+    { "source": "/downloads/jk-hiphop.apk", "destination": "https://github.com/radiodeluxe/webradiodeluxe/releases/download/android-v1.1.0/JK-HipHop.apk", "permanent": false },
     { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/programacao/index.html", "destination": "/programacao", "permanent": true },
     { "source": "/sobre/index.html", "destination": "/sobre", "permanent": true },

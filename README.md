@@ -41,9 +41,9 @@ A programação, as playlists, a equipe e a galeria são administradas por compl
 
 ## Aplicativo Android
 
-O módulo **Aplicativo** do master gerencia a identidade, o fundo, a visibilidade de enquete/contato e os banners exclusivos do Android. Transmissão, contato e redes são compartilhados com o site. Os anúncios superior e inferior têm ordem, ativação, imagem, descrição acessível e link próprios; a rotação ocorre a cada **15 segundos** em primeiro plano.
+O módulo **Aplicativo** do master gerencia a identidade, o fundo, a visibilidade de enquete/contato e os banners exclusivos do Android. Transmissão, contato e redes são compartilhados com o site. O carrossel quadrado superior reúne todos os anúncios ativos, inclusive os do antigo rodapé, em ordem crescente de posição. Cada anúncio tem imagem, descrição acessível e link próprios; a rotação ocorre a cada **15 segundos** em primeiro plano.
 
-Use banners de **1200 × 300 px (4:1)** ou **2400 × 600 px** para maior resolução, até 5 MB. O painel apresenta uma prévia em escala de **360 × 90 px** e avisa quando a proporção difere. As imagens aparecem inteiras, sem corte nem deformação. Não há anúncios fictícios quando nenhum banner está ativo.
+Use banners de **1080 × 1080 px (1:1)** ou **2160 × 2160 px** para maior resolução, até 5 MB. O painel apresenta uma prévia em escala de **360 × 360 px** e avisa quando a proporção difere. As imagens aparecem inteiras, sem corte nem deformação. Não há anúncios fictícios quando nenhum banner está ativo.
 
 - Prévia web: https://webradiodeluxe.vercel.app/aplicativo
 - APK: https://webradiodeluxe.vercel.app/downloads/jk-hiphop.apk

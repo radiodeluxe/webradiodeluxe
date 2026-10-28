@@ -79,7 +79,7 @@ for (const scenario of [
 
     await page.goto("/aplicativo");
     await page.getByRole("button", { name: "Abrir menu" }).click();
-    await page.getByRole("button", { name: "Enquete", exact: true }).click();
+    await page.getByRole("navigation", { name: "Menu do aplicativo" }).getByRole("button", { name: "Enquete", exact: true }).click();
 
     const dialog = page.getByRole("dialog");
     await expect(
@@ -111,7 +111,7 @@ test("app poll reports a temporary service failure without offering voting or st
 
   await page.goto("/aplicativo");
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await page.getByRole("button", { name: "Enquete", exact: true }).click();
+  await page.getByRole("navigation", { name: "Menu do aplicativo" }).getByRole("button", { name: "Enquete", exact: true }).click();
 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText(

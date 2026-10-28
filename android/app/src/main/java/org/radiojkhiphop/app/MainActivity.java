@@ -51,16 +51,17 @@ public final class MainActivity extends Activity {
     private String playbackError = "", appliedImage = "", appliedLogo = "";
     private TextView title, subtitle, status, syncStatus;
     private ImageView background, logo;
-    private RadioViews.VinylView vinyl;
+    private RadioViews.PlayButton play;
+    private Button pollShortcut, contactShortcut;
     private SeekBar volume;
     private LinearLayout socials;
-    private BannerSlot top, bottom;
+    private BannerSlot advertising;
 
     private final Runnable refresh = new Runnable() {
         @Override public void run() { if (foreground) { fetchConfig(); handler.postDelayed(this, 60000); } }
     };
     private final Runnable rotate = new Runnable() {
-        @Override public void run() { if (foreground) { top.next(); bottom.next(); handler.postDelayed(this, 15000); } }
+        @Override public void run() { if (foreground) { advertising.next(); handler.postDelayed(this, 15000); } }
     };
 
     @Override public void onCreate(Bundle state) {
@@ -82,21 +83,26 @@ public final class MainActivity extends Activity {
         background = new ImageView(this);
         background.setImageResource(org.radiojkhiphop.app.R.drawable.studio);
         background.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        background.setAlpha(.38f);
+        background.setAlpha(.18f);
         background.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         root.addView(background, new FrameLayout.LayoutParams(-1, -1));
         View shade = new View(this);
         shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{0xDD080909, 0x5C080909, 0xEE080909}));
+            new int[]{0xDD080909, 0xCC080909, 0xFF080909}));
         root.addView(shade, new FrameLayout.LayoutParams(-1, -1));
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setClipToPadding(false);
-        LinearLayout content = new LinearLayout(this);
+        LinearLayout content = new LinearLayout(this) {
+            @Override protected void onMeasure(int widthSpec, int heightSpec) {
+                int width = Math.min(MeasureSpec.getSize(widthSpec), dp(440));
+                super.onMeasure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), heightSpec);
+            }
+        };
         content.setOrientation(LinearLayout.VERTICAL);
         content.setGravity(Gravity.CENTER_HORIZONTAL);
-        content.setPadding(dp(20), dp(14), dp(20), dp(22));
-        scroll.addView(content, new ScrollView.LayoutParams(-1, -2));
+        content.setPadding(dp(18), dp(4), dp(18), dp(12));
+        scroll.addView(content, new ScrollView.LayoutParams(-1, -2, Gravity.CENTER_HORIZONTAL));
         root.addView(scroll, new FrameLayout.LayoutParams(-1, -1));
         root.setOnApplyWindowInsetsListener((view, insets) -> {
             if (android.os.Build.VERSION.SDK_INT >= 30) {
@@ -117,29 +123,24 @@ public final class MainActivity extends Activity {
         logo.setImageDrawable(new RadioViews.LogoDrawable());
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         logo.setContentDescription("JK HipHop — Web Rádio");
-        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(0, dp(76), 1);
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(0, dp(48), 1);
         logoParams.setMargins(dp(12), 0, dp(12), 0);
         header.addView(logo, logoParams);
         Button site = iconButton("↗", "Abrir site da rádio");
         site.setOnClickListener(v -> external(ApiClient.ORIGIN));
         header.addView(site, new LinearLayout.LayoutParams(dp(48), dp(52)));
-        content.addView(header, new LinearLayout.LayoutParams(-1, dp(90)));
-        top = new BannerSlot("top");
-        content.addView(top, margin(-1, -2, 14, 14));
-        TextView kicker = text("APERTE O PLAY. SINTA A CULTURA.", 10, GOLD, true);
-        kicker.setLetterSpacing(.14f);
-        content.addView(kicker, margin(-1, -2, 12, 8));
-        vinyl = new RadioViews.VinylView(this);
-        vinyl.setOnClickListener(v -> togglePlayback());
-        vinyl.setContentDescription("Ouvir rádio");
-        content.addView(vinyl, new LinearLayout.LayoutParams(-1, -2));
-        title = text("JK HipHop", 28, WHITE, true);
-        content.addView(title, margin(-1, -2, 12, 2));
-        subtitle = text("O rap em alto nível.", 16, MUTED, false);
-        content.addView(subtitle, margin(-1, -2, 0, 8));
-        status = text("Conectando à rádio…", 12, GOLD, false);
+        content.addView(header, new LinearLayout.LayoutParams(-1, dp(60)));
+        advertising = new BannerSlot();
+        content.addView(advertising, margin(-1, -2, 12, 20));
+        View spacer = new View(this);
+        content.addView(spacer, new LinearLayout.LayoutParams(1, 0, 1));
+        status = text("Conectando à rádio…", 10, GOLD, false);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        content.addView(status, margin(-1, -2, 0, 10));
+        content.addView(status, margin(-1, -2, 8, 8));
+        title = text("JK HipHop", 24, WHITE, true);
+        content.addView(title, margin(-1, -2, 0, 3));
+        subtitle = text("O rap em alto nível.", 13, MUTED, false);
+        content.addView(subtitle, margin(-1, -2, 0, 0));
         LinearLayout volumeRow = new LinearLayout(this);
         volumeRow.setGravity(Gravity.CENTER_VERTICAL);
         Button quieter = iconButton("−", "Diminuir volume");
@@ -163,16 +164,25 @@ public final class MainActivity extends Activity {
         Button louder = iconButton("+", "Aumentar volume");
         louder.setOnClickListener(v -> volume.setProgress(Math.min(100, volume.getProgress() + 10)));
         volumeRow.addView(louder, new LinearLayout.LayoutParams(dp(48), dp(48)));
-        content.addView(volumeRow, margin(-1, dp(56), 0, 12));
+        content.addView(volumeRow, margin(-1, dp(48), 6, 0));
+        LinearLayout controls = new LinearLayout(this);
+        controls.setGravity(Gravity.CENTER);
+        pollShortcut = shortcut("☷", "Enquete");
+        pollShortcut.setOnClickListener(v -> showPoll());
+        controls.addView(pollShortcut, new LinearLayout.LayoutParams(0, dp(64), 1));
+        play = new RadioViews.PlayButton(this);
+        play.setOnClickListener(v -> togglePlayback());
+        play.setContentDescription("Ouvir rádio");
+        controls.addView(play, new LinearLayout.LayoutParams(dp(76), dp(76)));
+        contactShortcut = shortcut("✉", "Contato");
+        contactShortcut.setOnClickListener(v -> showContact());
+        controls.addView(contactShortcut, new LinearLayout.LayoutParams(0, dp(64), 1));
+        content.addView(controls, margin(-1, -2, 0, 12));
         socials = new LinearLayout(this);
         socials.setGravity(Gravity.CENTER);
-        socials.setPadding(dp(8), dp(10), dp(8), dp(10));
-        socials.setBackground(card(0xD6080909, 0x442E302C, 24));
-        content.addView(socials, margin(-1, dp(84), 8, 12));
-        bottom = new BannerSlot("bottom");
-        content.addView(bottom, margin(-1, -2, 10, 8));
+        content.addView(socials, margin(-1, dp(48), 10, 8));
         syncStatus = text("", 10, MUTED, false);
-        content.addView(syncStatus, margin(-1, -2, 12, 0));
+        content.addView(syncStatus, margin(-1, -2, 8, 0));
         setContentView(root);
     }
 
@@ -221,8 +231,8 @@ public final class MainActivity extends Activity {
     private void updatePlayback() {
         boolean playing = controller != null && controller.isPlaying();
         boolean requested = controller != null && controller.getPlayWhenReady();
-        vinyl.setPlayback(playing, requested);
-        vinyl.setContentDescription(requested ? "Pausar rádio" : "Ouvir rádio");
+        play.setPlayback(playing, requested);
+        play.setContentDescription(requested ? "Pausar rádio" : "Ouvir rádio");
         if (!playbackError.isEmpty()) status.setText(playbackError);
         else if (playing) status.setText(getString(R.string.live_status, config.name));
         else if (requested && controller.getPlaybackState() == Player.STATE_BUFFERING) status.setText(R.string.connecting_stream);
@@ -272,8 +282,10 @@ public final class MainActivity extends Activity {
             background.setImageResource(org.radiojkhiphop.app.R.drawable.studio);
         }
         if (!config.background.isEmpty()) api.image(config.background, background);
-        top.update(config.slot("top"));
-        bottom.update(config.slot("bottom"));
+        // Retain all existing campaigns, including the old bottom placement.
+        advertising.update(config.banners);
+        pollShortcut.setVisibility(config.showPoll ? View.VISIBLE : View.INVISIBLE);
+        contactShortcut.setVisibility(config.showContact ? View.VISIBLE : View.INVISIBLE);
         socials.removeAllViews();
         social("instagram", "Instagram", config.instagram);
         social("facebook", "Facebook", config.facebook);
@@ -289,7 +301,7 @@ public final class MainActivity extends Activity {
         RadioViews.SocialView button = new RadioViews.SocialView(this, kind);
         button.setContentDescription("Abrir " + label + " da rádio");
         button.setOnClickListener(v -> external(url));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(56), 1);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(48), dp(48));
         params.setMargins(dp(3), 0, dp(3), 0);
         socials.addView(button, params);
     }
@@ -407,12 +419,12 @@ public final class MainActivity extends Activity {
     }
 
     @Override protected void onResume() {
-        super.onResume(); foreground = true; vinyl.setActive(true);
+        super.onResume(); foreground = true; play.setActive(true);
         handler.removeCallbacks(refresh); handler.removeCallbacks(rotate);
         handler.post(refresh); handler.postDelayed(rotate, 15000);
     }
     @Override protected void onPause() {
-        foreground = false; vinyl.setActive(false);
+        foreground = false; play.setActive(false);
         handler.removeCallbacks(refresh); handler.removeCallbacks(rotate);
         super.onPause();
     }
@@ -436,6 +448,12 @@ public final class MainActivity extends Activity {
         button.setContentDescription(description);
         return button;
     }
+    private Button shortcut(String glyph, String label) {
+        Button button = iconButton(glyph + "\n" + label, label);
+        button.setTextSize(12); button.setAllCaps(false); button.setTextColor(MUTED);
+        button.setMinWidth(0); button.setMinimumWidth(0);
+        return button;
+    }
     private Button actionButton(String label) {
         Button button = new Button(this); button.setText(label); button.setTextColor(Color.BLACK);
         button.setTextSize(13); button.setAllCaps(false); button.setBackground(card(GOLD, GOLD, 10)); return button;
@@ -453,29 +471,26 @@ public final class MainActivity extends Activity {
     int dp(float value) { return Math.round(value * getResources().getDisplayMetrics().density); }
 
     private final class BannerSlot extends LinearLayout {
-        private final String slot;
         private final TextView label;
         private final ImageView image;
         private List<AppConfig.Banner> rows = new ArrayList<>();
         private int index;
-        BannerSlot(String slot) {
-            super(MainActivity.this); this.slot = slot;
-            setOrientation(VERTICAL); setPadding(dp(6), dp(5), dp(6), dp(6));
-            setBackground(card(0xC0080909, 0xAAFFCF00, 12));
+        BannerSlot() {
+            super(MainActivity.this);
+            setOrientation(VERTICAL);
             label = text("PUBLICIDADE", 8, MUTED, false); label.setLetterSpacing(.14f);
-            label.setGravity(Gravity.START); addView(label, margin(-1, -2, 0, 4));
-            image = new ImageView(MainActivity.this);
+            label.setGravity(Gravity.START); addView(label, margin(-1, -2, 0, 8));
+            image = new ImageView(MainActivity.this) {
+                @Override protected void onMeasure(int widthSpec, int heightSpec) {
+                    int size = MeasureSpec.getSize(widthSpec);
+                    setMeasuredDimension(size, size);
+                }
+            };
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            addView(image, new LinearLayout.LayoutParams(-1, dp(74)));
+            image.setBackground(card(0xFF101110, 0x44D6B659, 18));
+            image.setClipToOutline(true);
+            addView(image, new LinearLayout.LayoutParams(-1, -2));
             setVisibility(GONE);
-        }
-        @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            super.onSizeChanged(w, h, oldw, oldh);
-            int wanted = Math.max(dp(48), (w - getPaddingLeft() - getPaddingRight()) / 4);
-            if (image.getLayoutParams().height != wanted) {
-                image.getLayoutParams().height = wanted;
-                image.requestLayout();
-            }
         }
         void update(List<AppConfig.Banner> fresh) {
             String previous = rows.isEmpty() ? "" : rows.get(index % rows.size()).id;

@@ -1105,8 +1105,9 @@
   height: 100%;
   object-fit: contain;
 }
-.admin-app-banner-preview {
-  aspect-ratio: 4 / 1;
+.admin-app-banner-preview,
+.admin-banner-preview.admin-app-banner-preview {
+  aspect-ratio: 1;
   min-height: 0;
   height: auto;
   background: #080c0d;

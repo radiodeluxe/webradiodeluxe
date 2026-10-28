@@ -96,3 +96,7 @@ O RPC também foi consultado pela API REST pública: HTTP 200, oito campos de
 configuração, oito de rádio e zero banners iniciais. Tentativas de criar banner
 e editar configuração com a chave pública anônima retornaram HTTP 401. Os
 advisors de segurança não apontaram novos problemas nos objetos criados.
+
+## Layout do app 1.1
+
+O APK 1.1 e a prévia web reúnem os anúncios `top` e `bottom` em um único carrossel quadrado superior, reordenado por `position` de forma estável. A rotação permanece em 15 segundos. O painel recomenda 1080 × 1080 px e cria novos anúncios em `top`; preserva o slot de anúncios existentes para instalações 1.0. Nenhuma migração de banco ou mudança no contrato público é necessária.
