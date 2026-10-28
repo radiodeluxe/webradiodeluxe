@@ -67,7 +67,7 @@ test("app fetch uses only the public key and projects current configuration plus
   ]);
   assert.equal(value.schema_version, 1);
   assert.equal(value.settings.radio_name, "JK HipHop");
-  assert.equal(Object.keys(value.settings).length, 7);
+  assert.equal(Object.keys(value.settings).length, 10);
   assert.equal(Object.keys(value.radio).length, 8);
   assert.equal(value.settings.logo_url, null);
   assert.equal(value.settings.background_url, `${APP_SITE_URL}/images/hero.webp`);
@@ -244,4 +244,22 @@ test("config errors produce generic 503 responses and HEAD failures have no resp
       }
     }
   }
+});
+
+
+test("ticker projection permits only plain bounded text and black or white with safe legacy defaults", () => {
+  const raw = config();
+  assert.deepEqual(Object.fromEntries(Object.entries(projectAppConfig(raw).settings).filter(([k]) => k.startsWith("ticker_"))), {
+    ticker_enabled: false, ticker_text: "", ticker_text_color: "black",
+  });
+  Object.assign(raw.settings, {ticker_enabled: true, ticker_text: "JK HipHop • Sua mensagem", ticker_text_color: "white"});
+  assert.equal(projectAppConfig(raw).settings.ticker_text_color, "white");
+  assert.equal(projectAppConfig(raw).settings.ticker_enabled, true);
+  for (const value of ["", "   ", "x".repeat(301), "line\nline", null, {}]) {
+    raw.settings.ticker_text = value;
+    assert.equal(projectAppConfig(raw).settings.ticker_enabled, false);
+  }
+  Object.assign(raw.settings, {ticker_enabled: "true", ticker_text: "Texto", ticker_text_color: "red"});
+  assert.equal(projectAppConfig(raw).settings.ticker_enabled, false);
+  assert.equal(projectAppConfig(raw).settings.ticker_text_color, "black");
 });

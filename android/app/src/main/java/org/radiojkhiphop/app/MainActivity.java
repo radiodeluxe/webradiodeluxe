@@ -52,6 +52,7 @@ public final class MainActivity extends Activity {
     private TextView title, subtitle, status, syncStatus;
     private ImageView background, logo;
     private RadioViews.PlayButton play;
+    private RadioViews.TickerView ticker;
     private Button pollShortcut, contactShortcut;
     private SeekBar volume;
     private LinearLayout socials;
@@ -131,7 +132,10 @@ public final class MainActivity extends Activity {
         header.addView(site, new LinearLayout.LayoutParams(dp(48), dp(52)));
         content.addView(header, new LinearLayout.LayoutParams(-1, dp(60)));
         advertising = new BannerSlot();
-        content.addView(advertising, margin(-1, -2, 12, 20));
+        content.addView(advertising, margin(-1, -2, 12, 8));
+        ticker = new RadioViews.TickerView(this);
+        ticker.setVisibility(View.GONE);
+        content.addView(ticker, margin(-1, dp(44), 0, 12));
         View spacer = new View(this);
         content.addView(spacer, new LinearLayout.LayoutParams(1, 0, 1));
         status = text("Conectando à rádio…", 10, GOLD, false);
@@ -284,6 +288,8 @@ public final class MainActivity extends Activity {
         if (!config.background.isEmpty()) api.image(config.background, background);
         // Retain all existing campaigns, including the old bottom placement.
         advertising.update(config.banners);
+        ticker.configure(config.tickerText, config.tickerWhite);
+        ticker.setVisibility(config.tickerEnabled ? View.VISIBLE : View.GONE);
         pollShortcut.setVisibility(config.showPoll ? View.VISIBLE : View.INVISIBLE);
         contactShortcut.setVisibility(config.showContact ? View.VISIBLE : View.INVISIBLE);
         socials.removeAllViews();
@@ -419,12 +425,12 @@ public final class MainActivity extends Activity {
     }
 
     @Override protected void onResume() {
-        super.onResume(); foreground = true; play.setActive(true);
+        super.onResume(); foreground = true; play.setActive(true); ticker.setActive(true);
         handler.removeCallbacks(refresh); handler.removeCallbacks(rotate);
         handler.post(refresh); handler.postDelayed(rotate, 15000);
     }
     @Override protected void onPause() {
-        foreground = false; play.setActive(false);
+        foreground = false; play.setActive(false); ticker.setActive(false);
         handler.removeCallbacks(refresh); handler.removeCallbacks(rotate);
         super.onPause();
     }

@@ -20,6 +20,71 @@ import android.view.View;
 final class RadioViews {
     private RadioViews() { }
 
+    /** Continuous single-line message. Tap to pause; never runs in the background. */
+    static final class TickerView extends View {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path arrow = new Path();
+        private final float density, textSize;
+        private String message = "";
+        private int textColor = Color.BLACK;
+        private boolean active, paused;
+        private float offset;
+        private long lastFrame;
+
+        TickerView(Context context) {
+            super(context);
+            density = getResources().getDisplayMetrics().density;
+            textSize = 14 * getResources().getDisplayMetrics().scaledDensity;
+            paint.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            setBackgroundColor(MainActivity.GOLD);
+            setClickable(true); setFocusable(true);
+            setOnClickListener(v -> {
+                paused = !paused; lastFrame = 0; describe(); invalidate();
+            });
+        }
+        void configure(String text, boolean white) {
+            if (!message.equals(text)) { message = text; offset = 0; lastFrame = 0; }
+            textColor = white ? Color.WHITE : Color.BLACK;
+            describe(); invalidate();
+        }
+        void setActive(boolean value) { active = value; lastFrame = 0; invalidate(); }
+        private void describe() {
+            setContentDescription("Mensagem da rádio: " + message + (paused ? ". Toque para continuar." : ". Toque para pausar."));
+        }
+        @Override public CharSequence getAccessibilityClassName() { return "android.widget.Button"; }
+        @Override protected void onDetachedFromWindow() { active = false; super.onDetachedFromWindow(); }
+        @Override protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            paint.setColor(textColor);
+            paint.setTextSize(textSize); paint.setStyle(Paint.Style.FILL);
+            float control = 44 * density, available = Math.max(0, getWidth() - control);
+            float period = Math.max(available, paint.measureText(message) + 48 * density);
+            boolean moving = active && !paused && isShown() && ValueAnimator.areAnimatorsEnabled();
+            long now = SystemClock.uptimeMillis();
+            if (moving && lastFrame > 0 && period > 0) offset = (offset + Math.min(now - lastFrame, 100) * .035f * density) % period;
+            lastFrame = moving ? now : 0;
+            float x = 16 * density - (ValueAnimator.areAnimatorsEnabled() ? offset : 0);
+            float baseline = getHeight() / 2f - (paint.ascent() + paint.descent()) / 2;
+            canvas.save(); canvas.clipRect(0, 0, available, getHeight());
+            canvas.drawText(message, x, baseline, paint);
+            canvas.drawText(message, x + period, baseline, paint); canvas.restore();
+            float cx = getWidth() - control / 2, cy = getHeight() / 2f;
+            if (paused) {
+                arrow.rewind(); arrow.moveTo(cx - 4 * density, cy - 6 * density);
+                arrow.lineTo(cx + 6 * density, cy); arrow.lineTo(cx - 4 * density, cy + 6 * density); arrow.close();
+                canvas.drawPath(arrow, paint);
+            } else {
+                canvas.drawRect(cx - 5 * density, cy - 6 * density, cx - 2 * density, cy + 6 * density, paint);
+                canvas.drawRect(cx + 2 * density, cy - 6 * density, cx + 5 * density, cy + 6 * density, paint);
+            }
+            if (isFocused()) {
+                paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(2 * density);
+                canvas.drawRect(density, density, getWidth() - density, getHeight() - density, paint);
+            }
+            if (moving) postInvalidateDelayed(33);
+        }
+    }
+
     /** Reproduces the existing public/logo-jk-hiphop.svg as native vector drawing. */
     static final class LogoDrawable extends Drawable {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);

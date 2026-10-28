@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import AppTicker from "./AppTicker";
 import {
   Download,
   ExternalLink,
@@ -87,6 +88,9 @@ type AppConfig = {
     show_poll: boolean;
     show_contact: boolean;
     banner_interval_seconds: number;
+    ticker_enabled?: boolean;
+    ticker_text?: string;
+    ticker_text_color?: "black" | "white";
   };
   radio: {
     stream_url: string | null;
@@ -552,6 +556,9 @@ export default function RadioApp() {
           </p>
         )}
         <RotatingBanner banners={config?.banners || []} />
+        {config?.settings.ticker_enabled && (
+          <AppTicker text={config.settings.ticker_text || ""} color={config.settings.ticker_text_color} />
+        )}
         <section className="ra-player" aria-label="Player da rádio">
           <span
             className={`ra-stream-status ${playing ? "is-live" : ""}`}

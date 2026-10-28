@@ -1,6 +1,7 @@
 # Configuração pública do aplicativo Android
 
 Migração aplicada: `20261025130326_android_app_management.sql`.
+Faixa de texto: `20261028005428_app_scrolling_ticker.sql`.
 
 O aplicativo não possui cadastro nem login administrativo. O master usa o
 painel do site; a autorização das gravações é conferida no banco por
@@ -15,6 +16,7 @@ presente em `auth.sessions`.
   `banner_interval_seconds=15`; clientes não podem alterar o intervalo, o ID
   ou o timestamp. O master pode atualizar a configuração, sem criar ou apagar
   a linha singleton.
+- Faixa em `app_settings`: `ticker_enabled`, `ticker_text` (até 300 caracteres, sem caracteres de controle e obrigatório quando habilitada), `ticker_text_color` (`black` ou `white`). O fundo amarelo é fixo. Os três campos são públicos para leitura; somente o master com sessão válida pode alterá-los. As restrições são verificadas no banco além da interface.
 - `public.app_banners`: `title` (3–120 caracteres), `alt_text` (até 240),
   `image_url`, `target_url`, `slot` (`top` ou `bottom`), `position` (0–9999) e
   `enabled`. IDs e timestamps são gerados no banco. Rascunhos podem ficar sem
@@ -41,6 +43,9 @@ somente HTTPS. Um caminho local deve ser resolvido contra o endereço do site.
     "show_poll": true,
     "show_contact": true,
     "banner_interval_seconds": 15,
+    "ticker_enabled": true,
+    "ticker_text": "JK HipHop • O rap em alto nível. • Siga @radiojkhiphop",
+    "ticker_text_color": "black",
     "updated_at": "timestamp"
   },
   "radio": {
@@ -100,3 +105,9 @@ advisors de segurança não apontaram novos problemas nos objetos criados.
 ## Layout do app 1.1
 
 O APK 1.1 e a prévia web reúnem os anúncios `top` e `bottom` em um único carrossel quadrado superior, reordenado por `position` de forma estável. A rotação permanece em 15 segundos. O painel recomenda 1080 × 1080 px e cria novos anúncios em `top`; preserva o slot de anúncios existentes para instalações 1.0. Nenhuma migração de banco ou mudança no contrato público é necessária.
+
+## Faixa do app 1.2
+
+A migração aditiva inclui os três campos da faixa na projeção explícita do RPC, preservando `SECURITY INVOKER`, RLS e os grants anteriores. `/api/app` também projeta apenas esses campos novos e mantém a versão 1 do contrato. Dados ausentes ou inválidos resultam em faixa oculta/texto preto. APKs anteriores continuam funcionando, mas precisam ser atualizados para mostrar a faixa.
+
+Em 28/10/2026, `supabase/tests/android-app.sql` passou no banco real com rollback: mensagem e cor salvas pelo master, rejeição de cor inválida, texto acima do limite, caracteres de controle e mensagem vazia habilitada; bloqueio de edição por anônimo, usuário comum e sessão revogada. A consulta pública inclui a configuração da faixa. Nenhum dado de teste permaneceu salvo. Os advisors não apontaram novos problemas relacionados aos objetos alterados; avisos anteriores sobre funções de enquete e proteção de senha permanecem fora desta alteração.

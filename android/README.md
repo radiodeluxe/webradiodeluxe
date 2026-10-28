@@ -5,6 +5,7 @@ Aplicativo nativo Java, sem WebView e sem login de ouvintes. O conteúdo vem da 
 ## Interface e gestão
 
 - Publicidade quadrada na parte superior e player compacto preto e dourado na parte inferior, com volume e estado real de reprodução.
+- No APK **1.2.0**, faixa amarela abaixo da publicidade com mensagem deslizante de até 300 caracteres e texto preto ou branco. Configure em **Admin → Aplicativo → Faixa amarela abaixo da publicidade** e clique em **Salvar aplicativo**. É possível ocultar a faixa. Toque nela para pausar/continuar; a animação só funciona em primeiro plano e respeita animações desativadas no Android.
 - Um carrossel superior reúne todos os anúncios ativos, inclusive os cadastrados no antigo rodapé, ordenados por posição, com rotação a cada **15 segundos** enquanto o aplicativo está visível.
 - Banner recomendado: **1080 × 1080 px, proporção 1:1**, JPG, PNG, WebP ou GIF até 5 MB. A imagem inteira é exibida com `FIT_CENTER`; outros formatos de proporção recebem espaço livre, sem corte ou deformação. O Android exibe a primeira imagem de GIFs, sem animação.
 - Redes sociais só aparecem quando o respectivo endereço está cadastrado. Links e anúncios abrem no navegador do aparelho.
@@ -82,7 +83,10 @@ Saída: `app/build/outputs/apk/release/app-release.apk`. Sem `signing.properties
     "background_url": null,
     "show_poll": true,
     "show_contact": true,
-    "banner_interval_seconds": 15
+    "banner_interval_seconds": 15,
+    "ticker_enabled": true,
+    "ticker_text": "JK HipHop • O rap em alto nível. • Siga @radiojkhiphop",
+    "ticker_text_color": "black"
   },
   "radio": {
     "stream_url": "",
@@ -101,6 +105,8 @@ Saída: `app/build/outputs/apk/release/app-release.apk`. Sem `signing.properties
 ```
 
 Cada banner: `id`, `title`, `alt_text`, `image_url`, `target_url`, `slot` (`top`/`bottom`), `position`. A rotação permanece em 15 segundos e não é controlada por valores arbitrários recebidos da API.
+
+Os campos `ticker_*` são aditivos e mantêm `schema_version=1`. APKs anteriores ignoram esses campos. O novo APK oculta a faixa se os campos estiverem ausentes ou se o texto estiver vazio; somente `white` ativa texto branco, e o padrão é `black`. O texto é conteúdo literal, sem HTML. Depois de instalar o APK 1.2.0, alterações no painel chegam sem reinstalação, na próxima consulta de configuração.
 
 Enquete disponível: `poll: {id, question, status, ends_at, total, options:[{id,label,votes}]}`. `POST /api/poll` recebe `{poll_id, option_id}` e retorna `{already_voted, results}`. A API só aceita o `Origin` canônico do site; o app envia esse valor explicitamente. O cookie assinado é salvo apenas para essa origem e nunca enviado a imagens ou anunciantes.
 

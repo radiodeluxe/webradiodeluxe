@@ -220,3 +220,45 @@ test("fresh configuration updates app identity and menu without a new build and 
     page.getByRole("heading", { name: "JK HipHop ao vivo", exact: true }),
   ).toBeVisible();
 });
+
+
+test("ticker stays between advertisement and player, scrolls, pauses and updates on refresh", async ({page}) => {
+  await page.setViewportSize({width:360,height:900});
+  await page.clock.install();
+  let settings = {...config.settings, ticker_enabled:true, ticker_text:"JK HipHop • A cultura tem voz", ticker_text_color:"black"};
+  await page.route("**/api/app",route=>route.fulfill({json:{...config,settings}}));
+  await page.route("https://images.example/**",route=>route.fulfill({contentType:"image/webp",path:"public/images/crowd.webp"}));
+  await page.goto('/aplicativo');
+  const ticker = page.getByRole('region',{name:'Mensagem da rádio',exact:true});
+  await expect(ticker).toHaveCSS('background-color','rgb(255, 207, 0)');
+  await expect(ticker).toHaveCSS('color','rgb(0, 0, 0)');
+  const ad = await page.locator('.ra-ad').boundingBox();
+  const band = await ticker.boundingBox();
+  const player = await page.locator('.ra-player').boundingBox();
+  expect(band!.y).toBeGreaterThanOrEqual(ad!.y+ad!.height);
+  expect(player!.y).toBeGreaterThanOrEqual(band!.y+band!.height);
+  const track = ticker.locator('.app-ticker-track');
+  const before = await track.evaluate(el=>getComputedStyle(el).transform);
+  await expect.poll(()=>track.evaluate(el=>getComputedStyle(el).transform)).not.toBe(before);
+  await page.getByRole('button',{name:'Pausar texto deslizante'}).click();
+  await expect(track).toHaveCSS('animation-play-state','paused');
+  settings={...settings,ticker_text:'Mensagem atualizada <img src=x>',ticker_text_color:'white'};
+  await page.clock.runFor(60000);
+  await expect(ticker).toContainText(settings.ticker_text);
+  await expect(ticker).toHaveCSS('color','rgb(255, 255, 255)');
+  await expect(ticker.locator('img')).toHaveCount(0);
+  await page.screenshot({path:'artifacts/app-ticker-mobile.png',fullPage:true});
+  settings={...settings,ticker_enabled:false};
+  await page.clock.runFor(60000);
+  await expect(ticker).toHaveCount(0);
+});
+
+test("ticker respects reduced motion and wraps a long message without horizontal overflow", async ({page}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.route('**/api/app',route=>route.fulfill({json:{...config,banners:[],settings:{...config.settings,ticker_enabled:true,ticker_text:'JK HipHop • '.repeat(25),ticker_text_color:'white'}}}));
+  await page.goto('/aplicativo');
+  await expect(page.locator('.app-ticker-track')).toHaveCSS('animation-name','none');
+  await expect(page.getByRole('button',{name:'Pausar texto deslizante'})).toBeHidden();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

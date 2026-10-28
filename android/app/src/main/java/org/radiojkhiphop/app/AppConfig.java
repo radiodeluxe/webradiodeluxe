@@ -14,6 +14,8 @@ final class AppConfig {
     String stream = "", instagram = "", facebook = "", tiktok = "", youtube = "", whatsapp = "";
     String email = "", contact = "";
     boolean showPoll = true, showContact = true, pollAvailable;
+    boolean tickerEnabled, tickerWhite;
+    String tickerText = "";
     final List<Banner> banners = new ArrayList<>();
     JSONObject poll;
 
@@ -30,6 +32,9 @@ final class AppConfig {
         c.background = https(settings.optString("background_url", ""));
         c.showPoll = settings.optBoolean("show_poll", true);
         c.showContact = settings.optBoolean("show_contact", true);
+        c.tickerText = text(settings, "ticker_text", "", 300);
+        c.tickerEnabled = settings.optBoolean("ticker_enabled", false) && !c.tickerText.isEmpty();
+        c.tickerWhite = "white".equals(settings.optString("ticker_text_color", "black"));
         c.stream = https(radio.optString("stream_url", ""));
         c.instagram = https(radio.optString("instagram_url", ""));
         c.facebook = https(radio.optString("facebook_url", ""));

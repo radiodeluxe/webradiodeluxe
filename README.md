@@ -52,7 +52,9 @@ Use banners de **1080 × 1080 px (1:1)** ou **2160 × 2160 px** para maior resol
 
 O APK nativo exige Android 8.0 ou superior, não tem login de ouvintes e mantém a reprodução iniciada pelo usuário em segundo plano. Consulta a configuração pública ao abrir, ao retornar e a cada 60 segundos. A enquete usa a mesma proteção de votos do site. A prévia web não oferece as garantias de reprodução em segundo plano do APK.
 
-A rota de download redireciona para o arquivo público `JK-HipHop.apk` da release GitHub `android-v1.0.0`. A chave de assinatura e suas senhas ficam fora do repositório e devem ser preservadas para as próximas atualizações.
+A partir do APK **1.2.0**, uma faixa amarela com texto deslizante aparece abaixo da publicidade. Em **Aplicativo → Faixa amarela abaixo da publicidade**, o master edita a mensagem (até 300 caracteres, em uma linha), escolhe texto preto ou branco e ativa ou oculta a faixa. A prévia do painel mostra as alterações antes de salvar. O app conectado atualiza a configuração em até 60 segundos; tocar na faixa pausa ou retoma a rolagem. A prévia web respeita a preferência de movimento reduzido. Versões anteriores do APK precisam ser atualizadas para exibir a faixa.
+
+A rota de download redireciona para o arquivo público `JK-HipHop.apk` da release GitHub `android-v1.2.0`. A chave de assinatura e suas senhas ficam fora do repositório e devem ser preservadas para as próximas atualizações.
 
 A página inicial convida a baixar o app em um popup após 1,2 segundo. Ele aparece uma vez por sessão da aba, usando `sessionStorage` (`jk-app-download-popup-v1`), e aguarda o fechamento de outras janelas do site. O visitante pode fechar pelo X, por **Agora não**, pela tecla Escape ou pelo fundo. O diálogo mantém o foco no conteúdo, restaura foco e rolagem ao fechar e respeita movimento reduzido. A arte própria em WebP só é carregada quando a janela abre. O botão usa a rota de APK acima; o popup não aparece no painel, na prévia do aplicativo nem nas páginas institucionais.
 

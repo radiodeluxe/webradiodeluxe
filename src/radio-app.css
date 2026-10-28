@@ -67,7 +67,7 @@ a {
   background: none; border: 0; color: inherit; text-decoration: none; text-align: left; font-size: 14px;
 }
 .ra-menu button:hover, .ra-menu a:hover { background: #ffcf0015; border-radius: 8px; }
-.ra-ad { margin: 12px 0 20px; flex-shrink: 0; }
+.ra-ad { margin: 12px 0 8px; flex-shrink: 0; }
 .ra-ad > span {
   display: block; color: #b2ab94; font-size: 8px; letter-spacing: 1.7px; margin: 0 3px 8px;
 }
@@ -288,3 +288,5 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .ra-spin { animation: none !important; }
 }
+
+.ra-content > .app-ticker { margin-bottom: 16px; }

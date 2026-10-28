@@ -32,7 +32,7 @@ begin
   execute 'set local role authenticated';
   if public.admin_access() is not true then raise exception 'Active master denied'; end if;
   update public.app_settings set radio_name='JK HipHop QA',tagline='Temporário',logo_url='/images/hero.webp',
-    background_url='https://example.com/background.webp',show_poll=false,show_contact=false where id=1;
+    background_url='https://example.com/background.webp',show_poll=false,show_contact=false,ticker_text='Mensagem QA • A cultura tem voz.',ticker_enabled=true,ticker_text_color='white' where id=1;
   get diagnostics changed=row_count;
   if changed<>1 then raise exception 'Master settings update denied'; end if;
   foreach slot_name in array array['top','bottom'] loop
@@ -53,8 +53,29 @@ begin
   snapshot:=public.public_app_config();
   if snapshot->'settings'->>'radio_name'<>'JK HipHop QA' or (snapshot->'settings'->>'show_poll')::boolean then
     raise exception 'App settings missing from public snapshot'; end if;
-  if (select count(*) from jsonb_object_keys(snapshot->'settings'))<>8
+  if (select count(*) from jsonb_object_keys(snapshot->'settings'))<>11
     or (select count(*) from jsonb_object_keys(snapshot->'radio'))<>8 then raise exception 'Unexpected exposed configuration fields'; end if;
+  if snapshot->'settings'->>'ticker_text'<>'Mensagem QA • A cultura tem voz.'
+    or snapshot->'settings'->>'ticker_text_color'<>'white'
+    or snapshot->'settings'->>'ticker_enabled'<>'true' then raise exception 'Ticker not persisted in snapshot'; end if;
+  begin
+    update public.app_settings set ticker_text_color='red' where id=1;
+    raise exception 'Invalid ticker color accepted';
+  exception when check_violation then null; end;
+  begin
+    update public.app_settings set ticker_text=repeat('x',301) where id=1;
+    raise exception 'Oversized ticker accepted';
+  exception when check_violation then null; end;
+  begin
+    update public.app_settings set ticker_text=E'line\nline' where id=1;
+    raise exception 'Multiline ticker accepted';
+  exception when check_violation then null; end;
+  begin
+    update public.app_settings set ticker_text='' where id=1;
+    raise exception 'Empty enabled ticker accepted';
+  exception when check_violation then null; end;
+  update public.app_settings set ticker_enabled=false,ticker_text='' where id=1;
+  update public.app_settings set ticker_enabled=true,ticker_text='Mensagem QA • A cultura tem voz.' where id=1;
   if exists(select 1 from jsonb_array_elements(snapshot->'banners') b where b->>'id'=draft::text) then
     raise exception 'Public snapshot exposes master draft'; end if;
   begin
@@ -115,7 +136,7 @@ begin
     raise exception 'Visitor cannot see published banner'; end if;
   if snapshot->'settings'->>'banner_interval_seconds'<>'15' then raise exception 'Rotation interval incorrect'; end if;
   begin
-    update public.app_settings set tagline='Public write' where id=1;
+    update public.app_settings set tagline='Public write',ticker_text='Public write',ticker_text_color='black',ticker_enabled=false where id=1;
     raise exception 'Anonymous settings update allowed';
   exception when insufficient_privilege then null; end;
   begin
@@ -149,7 +170,7 @@ begin
   execute 'set local role authenticated';
   if public.admin_access() then raise exception 'Nonmaster authorized'; end if;
   if exists(select 1 from public.app_banners where id=draft) then raise exception 'Nonmaster sees draft'; end if;
-  update public.app_settings set tagline='Nonmaster write' where id=1;
+  update public.app_settings set tagline='Nonmaster write',ticker_text='Nonmaster write',ticker_text_color='black',ticker_enabled=false where id=1;
   get diagnostics changed=row_count;
   if changed<>0 then raise exception 'Nonmaster settings update allowed'; end if;
   begin
@@ -181,7 +202,7 @@ begin
   perform set_config('request.jwt.claims',jsonb_build_object('sub',master,'role','authenticated','session_id',sid)::text,true);
   execute 'set local role authenticated';
   if public.admin_access() then raise exception 'Revoked session authorized'; end if;
-  update public.app_settings set tagline='Revoked write' where id=1;
+  update public.app_settings set tagline='Revoked write',ticker_text='Revoked write',ticker_text_color='black',ticker_enabled=false where id=1;
   get diagnostics changed=row_count;
   if changed<>0 then raise exception 'Revoked session changes app settings'; end if;
   update public.app_banners set enabled=true where id=draft;

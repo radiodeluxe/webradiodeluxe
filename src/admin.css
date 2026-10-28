@@ -1323,3 +1323,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+.admin-app-ticker-fields { min-width: 0; display: grid; gap: 16px; border: 1px solid #484020; border-radius: 12px; padding: 18px; margin: 8px 0; }
+.admin-app-ticker-fields legend { padding: 0 8px; color: #ffcf00; font-weight: 700; }

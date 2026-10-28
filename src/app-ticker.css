@@ -1,0 +1,42 @@
+.app-ticker {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #ffcf00;
+  font: 700 14px/1.4 Arial, sans-serif;
+  text-align: left;
+}
+.app-ticker-viewport { flex: 1; min-width: 0; overflow: hidden; }
+.app-ticker-track {
+  display: flex;
+  width: max-content;
+  min-width: 200%;
+  animation: app-ticker-scroll var(--ticker-duration, 18s) linear infinite;
+}
+.app-ticker-track span { flex: 1 0 auto; padding: 10px 24px; white-space: nowrap; }
+.app-ticker button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  min-height: 44px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid currentColor;
+  cursor: pointer;
+}
+.app-ticker button:focus-visible { outline: 2px solid currentColor; outline-offset: -5px; }
+.app-ticker.is-paused .app-ticker-track { animation-play-state: paused; }
+.app-ticker.is-paused .app-ticker-viewport { overflow-x: auto; }
+@keyframes app-ticker-scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .app-ticker-track { animation: none; width: auto; min-width: 0; }
+  .app-ticker-track span { white-space: normal; overflow-wrap: anywhere; min-width: 0; flex: 1; }
+  .app-ticker-track span[aria-hidden], .app-ticker button { display: none; }
+}

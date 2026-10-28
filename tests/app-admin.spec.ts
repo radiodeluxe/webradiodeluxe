@@ -36,6 +36,9 @@ async function appMaster(page: Page) {
       background_url: null,
       show_poll: true,
       show_contact: true,
+      ticker_enabled: true,
+      ticker_text: "JK HipHop • O rap em alto nível.",
+      ticker_text_color: "black",
     } as Record<string, unknown>,
     radio: {
       stream_url: null,
@@ -458,4 +461,33 @@ test("failed uploads do not persist app ads and failed saves clean newly uploade
   expect(state.uploaded[1]).toMatch(/^branding\/[0-9a-f-]{36}\.png$/);
   expect(state.removed).toEqual(state.uploaded);
   expect(state.settings.logo_url).toBe(null);
+});
+
+
+test("master saves ticker text, both colors and visibility; blank enabled message is rejected", async ({ page }) => {
+  const state = await appMaster(page);
+  const message = page.getByLabel("Mensagem da faixa", {exact:true});
+  const color = page.getByRole("combobox", { name: "Cor do texto da faixa", exact: true });
+  const enabled = page.getByLabel("Mostrar faixa de texto no aplicativo", {exact:true});
+  const save = page.getByRole("button", {name:"Salvar aplicativo", exact:true});
+  await message.fill("Sua música, sua rádio • JK HipHop");
+  await color.selectOption("white");
+  await expect(page.locator('.app-ticker')).toHaveCSS('color','rgb(255, 255, 255)');
+  await save.click();
+  await expect.poll(()=>state.settings.ticker_text_color).toBe("white");
+  expect(state.settings.ticker_text).toBe("Sua música, sua rádio • JK HipHop");
+  await page.reload();
+  await page.getByRole('button',{name:'Aplicativo',exact:true}).click();
+  await expect(message).toHaveValue("Sua música, sua rádio • JK HipHop");
+  await message.fill("");
+  const count = state.mutations.length;
+  await save.click();
+  await expect(page.getByRole('alert')).toContainText('Informe a mensagem');
+  expect(state.mutations.length).toBe(count);
+  await enabled.uncheck();
+  await color.selectOption("black");
+  await save.click();
+  await expect.poll(()=>state.settings.ticker_enabled).toBe(false);
+  expect(state.settings.ticker_text_color).toBe('black');
+  await expect(page.locator('.app-ticker')).toHaveCount(0);
 });

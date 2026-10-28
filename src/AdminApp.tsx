@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { safeUrl } from "./lib";
+import AppTicker from "./AppTicker";
 
 type AppSettings = {
   radio_name: string;
@@ -21,6 +22,9 @@ type AppSettings = {
   background_url: string | null;
   show_poll: boolean;
   show_contact: boolean;
+  ticker_enabled: boolean;
+  ticker_text: string;
+  ticker_text_color: "black" | "white";
 };
 type AppBanner = {
   id: string;
@@ -235,7 +239,7 @@ export default function AppManager({
         client
           .from("app_settings")
           .select(
-            "radio_name,tagline,logo_url,background_url,show_poll,show_contact",
+            "radio_name,tagline,logo_url,background_url,show_poll,show_contact,ticker_enabled,ticker_text,ticker_text_color",
           )
           .eq("id", 1)
           .single(),
@@ -498,6 +502,14 @@ function AppSettingsEditor({
     if (busy) return;
     setError("");
     setNotice("");
+    if (values.ticker_text.trim().length > 300 || /[\u0000-\u001f\u007f-\u009f]/u.test(values.ticker_text)) {
+      setError("Use uma mensagem de até 300 caracteres, em uma única linha.");
+      return;
+    }
+    if (values.ticker_enabled && !values.ticker_text.trim()) {
+      setError("Informe a mensagem ou desative a faixa amarela.");
+      return;
+    }
     if (
       values.radio_name.trim().length < 3 ||
       values.radio_name.trim().length > 80
@@ -523,6 +535,7 @@ function AppSettingsEditor({
         ...values,
         radio_name: values.radio_name.trim(),
         tagline: values.tagline.trim(),
+        ticker_text: values.ticker_text.trim(),
         logo_url: imageUrl(values.logo_url?.trim()),
         background_url: imageUrl(values.background_url?.trim()),
       };
@@ -645,6 +658,33 @@ function AppSettingsEditor({
         <p className="admin-table-note">
           Rotação da publicidade: 15 segundos por anúncio, no carrossel superior.
         </p>
+        <fieldset className="admin-app-ticker-fields">
+          <legend>Faixa amarela abaixo da publicidade</legend>
+          <label className="admin-banner-enabled">
+            <input type="checkbox" checked={values.ticker_enabled} disabled={busy}
+              onChange={(event) => setValues({ ...values, ticker_enabled: event.target.checked })} />
+            Mostrar faixa de texto no aplicativo
+          </label>
+          <label className="admin-field">
+            <span>Mensagem da faixa</span>
+            <input value={values.ticker_text} maxLength={300} disabled={busy}
+              placeholder="Escreva sua mensagem para os ouvintes"
+              onChange={(event) => setValues({ ...values, ticker_text: event.target.value })} />
+          </label>
+          <div className="admin-form-row">
+            <label className="admin-field">
+              <span>Cor do texto da faixa</span>
+              <select value={values.ticker_text_color} disabled={busy}
+                onChange={(event) => setValues({ ...values, ticker_text_color: event.target.value === "white" ? "white" : "black" })}>
+                <option value="black">Preto</option>
+                <option value="white">Branco</option>
+              </select>
+            </label>
+            <p className="admin-table-note">{values.ticker_text.length}/300 caracteres. O fundo permanece amarelo.</p>
+          </div>
+          {values.ticker_enabled && <AppTicker text={values.ticker_text} color={values.ticker_text_color} />}
+          <p className="admin-table-note">Texto deslizando da direita para a esquerda. Após salvar, o app conectado recebe a alteração em até 1 minuto. Requer o APK 1.2.0 ou mais recente.</p>
+        </fieldset>
         <button className="yellow-button" disabled={busy}>
           {busy ? "Salvando…" : "Salvar aplicativo"}
           <Check size={16} />
